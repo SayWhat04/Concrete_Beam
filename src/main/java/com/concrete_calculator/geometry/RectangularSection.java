@@ -1,6 +1,9 @@
-package com.concrete_calculator;
+package com.concrete_calculator.geometry;
 
-public class RectangularSection implements Section {
+import com.concrete_calculator.materials.Concrete;
+import com.concrete_calculator.materials.Steel;
+
+public class RectangularSection extends Section {
     private double height;
     private double width;
 

@@ -1,4 +1,4 @@
-package com.concrete_calculator;
+package com.concrete_calculator.materials;
 
 public enum Steel {
     B_500(500),

@@ -1,5 +1,9 @@
-package com.concrete_calculator;
+package com.concrete_calculator.solvers;
 
+
+import com.concrete_calculator.geometry.RectangularSection;
+import com.concrete_calculator.materials.Concrete;
+import com.concrete_calculator.materials.Steel;
 
 public class BendingSolver {
 
@@ -12,7 +16,6 @@ public class BendingSolver {
 
         System.out.println("h: " + height);
         System.out.println("b: " + width);
-
 
         double effectiveDepth = section.getEffectiveDepth();
 

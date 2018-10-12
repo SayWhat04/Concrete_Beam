@@ -26,7 +26,7 @@ public class Main extends Application {
         // Set rectangular section
         RectangularSection calculatedSection = new RectangularSection(height, width, Concrete.valueOf(selectedConcrete), Steel.valueOf(selectedSteel));
         calculatedSection.setEffectiveDepth(effectiveDepth);
-        BendingSolver solver = new BendingSolver();
+        Solver solver = new Solver();
         double[] reinforcement = solver.calculateReinforcement(calculatedSection, bendingMoment);
         System.out.println(Arrays.toString(reinforcement));
         */
