@@ -1,4 +1,4 @@
-package com.concrete_calculator;
+package com.concrete_calculator.models;
 
 public class ForcesSet {
 

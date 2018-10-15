@@ -7,7 +7,9 @@ import com.concrete_calculator.materials.Steel;
 
 public class BendingSolver {
 
+   /*
     public double[] calculateReinforcement(RectangularSection section, double bendingMoment) {
+
 
         System.out.println("M_Ed: " + bendingMoment);
 
@@ -80,6 +82,6 @@ public class BendingSolver {
 
 
     }
-
+*/
 
 }

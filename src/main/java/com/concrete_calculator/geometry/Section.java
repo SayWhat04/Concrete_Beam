@@ -1,24 +1,14 @@
 package com.concrete_calculator.geometry;
 
-import com.concrete_calculator.materials.Concrete;
-import com.concrete_calculator.materials.Steel;
+public interface Section {
 
-public abstract class Section {
+    double calculateArea();
 
-    abstract double calculateArea();
+    double calculateMomentOfInertiaX();
 
-    abstract double calculateMomentOfInertiaX();
+    double calculateMomentOfInertiaY();
 
-    abstract double calculateMomentOfInertiaY();
+    double getHeight();
 
-    abstract double getHeight();
-
-    abstract double getWidth();
-
-    abstract double getEffectiveDepth();
-
-    abstract Concrete getConcreteType();
-
-    abstract Steel getSteelType();
-
+    double getWidth();
 }
