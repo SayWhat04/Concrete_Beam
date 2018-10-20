@@ -4,7 +4,6 @@ import com.concrete_calculator.models.CalculationModel;
 import com.concrete_calculator.materials.Concrete;
 import com.concrete_calculator.materials.Steel;
 
-
 public class Solver {
 
     public double[] calculateReinforcement(CalculationModel bendingCalculationModel) {
@@ -69,12 +68,14 @@ public class Solver {
         if (dzeta_ef <= dzeta_ef_lim) {
             System.out.println("Compressed reinforcement is not needed");
 
+            //Lever arm of internal forces
             double z_c = (1 - 0.5 * dzeta_ef) * bottomReinforcementEffectiveDepth;
 
             //TEST
             System.out.println("z_c: " + z_c);
 
-            double reinforcement_As_1 = (bendingMoment * 10000) / (z_c * bottomReinforcementSteelStrengthCalc * 1000);
+            //As_1:
+            double reinforcement_As_1 = (bendingMoment * 1000000) / (z_c * bottomReinforcementSteelStrengthCalc);
             double reinforcement_As_2 = 0;
 
             double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
@@ -89,10 +90,8 @@ public class Solver {
             //TEST
             System.out.println(M_rd_pz);
 
-            //  TODO: Add concrete coverage + steel strength
             double reinforcement_As_2 = (bendingMoment - M_rd_pz) / ((bottomReinforcementEffectiveDepth - 1) * 1);
 
-            //  TODO: Add steel strength
             double reinforcement_As_1 = ((M_rd_pz) / ((1 - 0.5 * dzeta_ef_lim) * bottomReinforcementEffectiveDepth * 1)) + reinforcement_As_2;
 
             double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
@@ -103,5 +102,35 @@ public class Solver {
 
     }
 
+    public static int calculateNumberOfBars(double reinforcementCrossSectionArea, int barDiameter) {
+
+        //TEST
+        System.out.println("reinforcementCrossSectionArea: " + reinforcementCrossSectionArea);
+        System.out.println("barDiameter: " + barDiameter);
+
+        double crossSectionAreaOfBar = (Math.PI * Math.pow(barDiameter, 2)) / (4);
+        double firstIterationNumberOfBars = reinforcementCrossSectionArea / crossSectionAreaOfBar;
+        int secondIterationNumberOfBars;
+
+        //TEST
+        System.out.println("crossSectionAreaOfBar: " + crossSectionAreaOfBar);
+        System.out.println("firstIterationNumberOfBars: " + firstIterationNumberOfBars);
+
+        if (Math.round(firstIterationNumberOfBars) < firstIterationNumberOfBars) {
+            secondIterationNumberOfBars = (int) (Math.round(firstIterationNumberOfBars)) + 1;
+
+            //TEST
+            System.out.println("secondIterationNumberOfBars: " + secondIterationNumberOfBars);
+
+            return secondIterationNumberOfBars;
+        } else {
+            secondIterationNumberOfBars = (int) (Math.round(firstIterationNumberOfBars));
+
+            //TEST
+            System.out.println("secondIterationNumberOfBars: " + secondIterationNumberOfBars);
+
+            return secondIterationNumberOfBars;
+        }
+    }
 
 }

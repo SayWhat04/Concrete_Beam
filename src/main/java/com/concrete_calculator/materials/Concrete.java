@@ -5,6 +5,7 @@ public enum Concrete {
 
     // TODO: Correction of units for concrete properties
     // TODO: Add all of concrete types
+    // TODO: Comment units of specific parameter
     C12_15(12, 15, 20, 1.6, 1.1, 2.0, 27, 3.5, 1.0, 0.8, 0.493),
     C16_20(16, 20, 24, 1.9, 1.3, 2.5, 29, 3.5, 1.0, 0.8, 0.493),
     C20_25(20, 25, 28, 2.2, 1.5, 2.9, 30, 3.5, 1.0, 0.8, 0.493),

@@ -102,7 +102,20 @@ public class RectangularSectionBendingController {
 
         double[] reinforcement = pureBendingSolver.calculateReinforcement(pureBendingCalculationModel);
 
+        double bottomReinforcementCrossSection = reinforcement[0];
+        double topReinforcementCrossSection = reinforcement[1];
+
         //TEST
         System.out.println(Arrays.toString(reinforcement));
+
+        //TEST: Calculate number of bars
+        int numberOfBottomBars = Solver.calculateNumberOfBars(bottomReinforcementCrossSection, bottomMainBars.getBarDiameter());
+        int numberOfTopBars = Solver.calculateNumberOfBars(topReinforcementCrossSection, topMainBars.getBarDiameter());
+
+        //TEST
+        System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
+        System.out.println("Number of Top Bars: " + numberOfTopBars);
     }
+
+
 }

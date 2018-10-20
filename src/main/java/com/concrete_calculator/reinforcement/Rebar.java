@@ -16,7 +16,7 @@ public class Rebar {
         return steelType;
     }
 
-    public double getBarDiameter() {
+    public int getBarDiameter() {
         return barDiameter;
     }
 }
