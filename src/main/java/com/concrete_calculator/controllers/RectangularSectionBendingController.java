@@ -83,7 +83,7 @@ public class RectangularSectionBendingController {
 
     public void calculateBending() {
 
-        Section rectangularSection = new RectangularSection(Double.parseDouble(heightTextField.getText().toString()), Double.parseDouble(widthTextField.getText().toString()));
+        Section rectangularSection = new RectangularSection(Double.parseDouble(heightTextField.getText()), Double.parseDouble(widthTextField.getText()));
         Geometry calculatedGeometry = new Geometry(rectangularSection, 5000);
 
         ForcesSet pureBendingForcesSet = new ForcesSet();
@@ -92,30 +92,17 @@ public class RectangularSectionBendingController {
         Rebar bottomMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(bottomMainBarsComboBox.getValue().toString()));
         Rebar topMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(topMainBarsComboBox.getValue().toString()));
         Rebar stirrups = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(stirrupsComboBox.getValue().toString()));
-        double bottomReinforcementCoverage = Double.parseDouble(bottomCoverageTextField.getText().toString());
-        double topReinforcementCoverage = Double.parseDouble(topCoverageTextField.getText().toString());
+        double bottomReinforcementCoverage = Double.parseDouble(bottomCoverageTextField.getText());
+        double topReinforcementCoverage = Double.parseDouble(topCoverageTextField.getText());
         ReinforcementProperties reinforcementProperties = new ReinforcementProperties(bottomMainBars, topMainBars, bottomReinforcementCoverage, topReinforcementCoverage);
 
         String selectedConcreteClass = concreteClassComboBox.getValue().toString();
-
         CalculationModel pureBendingCalculationModel = new CalculationModel(calculatedGeometry, pureBendingForcesSet, reinforcementProperties, Concrete.valueOf(selectedConcreteClass));
-
         Solver pureBendingSolver = new Solver();
 
         double[] reinforcement = pureBendingSolver.calculateReinforcement(pureBendingCalculationModel);
 
+        //TEST
         System.out.println(Arrays.toString(reinforcement));
-
-        /* ADDED FOR TESTS
-        System.out.println("Bottom bars:");
-        System.out.println(bottomMainBars.getBarDiameter());
-        System.out.println(bottomMainBars.getSteelType());
-        System.out.println("Top bars:");
-        System.out.println(topMainBars.getBarDiameter());
-        System.out.println(topMainBars.getSteelType());
-        System.out.println("Stirrups bars:");
-        System.out.println(stirrups.getBarDiameter());
-        System.out.println(stirrups.getSteelType());
-        */
     }
 }

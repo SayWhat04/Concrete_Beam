@@ -9,8 +9,8 @@
         <module name="Concrete_Beam" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Concrete_Beam" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="Concrete_Beam" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

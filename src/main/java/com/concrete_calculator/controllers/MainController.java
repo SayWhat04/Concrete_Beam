@@ -18,7 +18,7 @@ public class MainController {
         topMenuButtonsController.setMainController(this);
     }
 
-    private void setCenter(String fxmlPath) {
+    public void setCenter(String fxmlPath) {
         mainBorderPane.setCenter(FxmlUtils.fxmlLoader(fxmlPath));
     }
 

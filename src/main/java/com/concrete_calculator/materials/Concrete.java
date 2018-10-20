@@ -32,7 +32,6 @@ public enum Concrete {
     private double lambda;
     private double dzeta_ef_lim;
 
-
     Concrete(double f_ck, double f_ck_cube, double f_cm, double f_ctm, double f_ctk_005, double f_ctk_095, double e_cm, double epsylon_cu3, double eta, double lambda, double dzeta_ef_lim) {
         this.f_ck = f_ck;
         this.f_ck_cube = f_ck_cube;

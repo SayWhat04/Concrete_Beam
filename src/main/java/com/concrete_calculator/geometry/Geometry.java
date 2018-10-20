@@ -1,7 +1,5 @@
 package com.concrete_calculator.geometry;
 
-import com.concrete_calculator.geometry.Section;
-
 public class Geometry {
 
     Section section;

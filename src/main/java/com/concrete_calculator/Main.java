@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
+import java.util.ResourceBundle;
 
 public class Main extends Application {
 

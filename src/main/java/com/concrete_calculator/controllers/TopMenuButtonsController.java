@@ -2,7 +2,7 @@ package com.concrete_calculator.controllers;
 
 public class TopMenuButtonsController {
 
-    public static final String BENDING_WINDOW_FXML = "/fxml/BendingWindow.fxml";
+    private static final String BENDING_WINDOW_FXML = "/fxml/BendingWindow.fxml";
     private MainController mainController;
 
     public void setMainController(MainController mainController) {

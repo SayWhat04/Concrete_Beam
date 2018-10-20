@@ -1,6 +1,5 @@
 package com.concrete_calculator.reinforcement;
 
-
 import com.concrete_calculator.materials.Steel;
 
 public class Rebar {
