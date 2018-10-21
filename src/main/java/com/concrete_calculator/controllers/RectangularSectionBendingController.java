@@ -11,17 +11,22 @@ import com.concrete_calculator.reinforcement.Rebar;
 import com.concrete_calculator.materials.Steel;
 import com.concrete_calculator.solvers.Solver;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class RectangularSectionBendingController {
 
     private static final Object[] MAIN_BARS_DIAMETERS = {8, 10, 12, 14, 16, 20, 25, 28, 32, 40};
     private static final Object[] STIRRUPS_DIAMETERS = {6, 8, 10, 12};
+
+    //TODO: Create helper Class with number formats and units
+    DecimalFormat twoNumbers = new DecimalFormat("##.00");
 
     @FXML
     TextField widthTextField;
@@ -54,17 +59,30 @@ public class RectangularSectionBendingController {
     TextField bendingMomentTextField;
 
     @FXML
+    TextField bottomCalculatedReinforcementTextField;
+
+    @FXML
+    TextField bottomBarsNumberTextField;
+
+    @FXML
+    TextField bottomActualReinforcementTextField;
+
+    @FXML
     Button calculateButton;
 
     @FXML
     public void initialize() {
+        fillComboBoxes();
+        initBindings();
+        initListeners();
+    }
+
+    private void fillComboBoxes() {
         bottomMainBarsComboBox.getItems().addAll(MAIN_BARS_DIAMETERS);
         topMainBarsComboBox.getItems().addAll(MAIN_BARS_DIAMETERS);
         stirrupsComboBox.getItems().addAll(STIRRUPS_DIAMETERS);
         concreteClassComboBox.getItems().setAll(Concrete.values());
         steelClassComboBox.getItems().setAll(Steel.values());
-
-        initBindings();
     }
 
     private void initBindings() {
@@ -79,6 +97,30 @@ public class RectangularSectionBendingController {
                 .or(Bindings.isNull(steelClassComboBox.valueProperty()))
                 .or(Bindings.isEmpty(bendingMomentTextField.textProperty()))
         );
+    }
+
+    private void initListeners() {
+        widthTextField.textProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                    widthTextField.setText(oldValue);
+                }
+            }
+        });
+        heightTextField.textProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                    heightTextField.setText(oldValue);
+                }
+            }
+        });
+        bendingMomentTextField.textProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                    bendingMomentTextField.setText(oldValue);
+                }
+            }
+        });
     }
 
     public void calculateBending() {
@@ -115,6 +157,11 @@ public class RectangularSectionBendingController {
         //TEST
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
+
+        //TODO: Add method and textFields for top reinforcement
+        bottomCalculatedReinforcementTextField.setText(twoNumbers.format(bottomReinforcementCrossSection));
+        bottomBarsNumberTextField.setText(Integer.valueOf(numberOfBottomBars).toString());
+
     }
 
 

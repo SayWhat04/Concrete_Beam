@@ -64,7 +64,6 @@ public class Solver {
         //TEST
         System.out.println("Dzeta_ef: " + dzeta_ef);
 
-
         if (dzeta_ef <= dzeta_ef_lim) {
             System.out.println("Compressed reinforcement is not needed");
 

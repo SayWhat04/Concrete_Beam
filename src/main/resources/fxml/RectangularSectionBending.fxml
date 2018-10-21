@@ -55,13 +55,24 @@
             <Label text="Main bars (top)" GridPane.rowIndex="5" />
             <TextField fx:id="topCoverageTextField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
             <ComboBox fx:id="topMainBarsComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label text="Results:" GridPane.columnIndex="3" GridPane.rowIndex="5">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label text="Calculated cross section" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+            <Label text="Number of bars" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+            <Label text="Actual cross section" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+            <TextField fx:id="bottomCalculatedReinforcementTextField" editable="false" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+            <TextField fx:id="bottomBarsNumberTextField" editable="false" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+            <TextField fx:id="bottomActualReinforcementTextField" editable="false" GridPane.columnIndex="4" GridPane.rowIndex="8" />
          </children>
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="55.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="85.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
