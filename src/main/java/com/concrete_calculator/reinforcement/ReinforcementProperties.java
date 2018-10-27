@@ -4,13 +4,15 @@ public class ReinforcementProperties {
 
     Rebar bottomReinforcement;
     Rebar topReinforcement;
+    Rebar stirrup;
     double bottomCoverage;
     double topCoverage;
 
     //TODO: Add Stirrups to implementation
-    public ReinforcementProperties(Rebar bottomReinforcement, Rebar topReinforcement, double bottomCoverage, double topCoverage) {
+    public ReinforcementProperties(Rebar bottomReinforcement, Rebar topReinforcement, Rebar stirrup, double bottomCoverage, double topCoverage) {
         this.bottomReinforcement = bottomReinforcement;
         this.topReinforcement = topReinforcement;
+        this.stirrup = stirrup;
         this.bottomCoverage = bottomCoverage;
         this.topCoverage = topCoverage;
     }
@@ -21,7 +23,7 @@ public class ReinforcementProperties {
 
     public void setBottomReinforcement(Rebar bottomReinforcement) {
         this.bottomReinforcement = bottomReinforcement;
-       }
+    }
 
     public Rebar getTopReinforcement() {
         return topReinforcement;
@@ -29,7 +31,7 @@ public class ReinforcementProperties {
 
     public void setTopReinforcement(Rebar topReinforcement) {
         this.topReinforcement = topReinforcement;
-       }
+    }
 
     public double getBottomCoverage() {
         return bottomCoverage;
@@ -45,5 +47,13 @@ public class ReinforcementProperties {
 
     public void setTopCoverage(double topCoverage) {
         this.topCoverage = topCoverage;
+    }
+
+    public Rebar getStirrup() {
+        return stirrup;
+    }
+
+    public void setStirrup(Rebar stirrup) {
+        this.stirrup = stirrup;
     }
 }

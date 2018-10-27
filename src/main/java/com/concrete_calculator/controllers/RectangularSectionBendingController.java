@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -26,7 +27,7 @@ public class RectangularSectionBendingController {
     private static final Object[] STIRRUPS_DIAMETERS = {6, 8, 10, 12};
 
     //TODO: Create helper Class with number formats and units
-    DecimalFormat twoNumbers = new DecimalFormat("##.00");
+    DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("##.00");
 
     @FXML
     TextField widthTextField;
@@ -136,13 +137,13 @@ public class RectangularSectionBendingController {
         Rebar stirrups = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(stirrupsComboBox.getValue().toString()));
         double bottomReinforcementCoverage = Double.parseDouble(bottomCoverageTextField.getText());
         double topReinforcementCoverage = Double.parseDouble(topCoverageTextField.getText());
-        ReinforcementProperties reinforcementProperties = new ReinforcementProperties(bottomMainBars, topMainBars, bottomReinforcementCoverage, topReinforcementCoverage);
+        ReinforcementProperties reinforcementProperties = new ReinforcementProperties(bottomMainBars, topMainBars, stirrups, bottomReinforcementCoverage, topReinforcementCoverage);
 
         String selectedConcreteClass = concreteClassComboBox.getValue().toString();
         CalculationModel pureBendingCalculationModel = new CalculationModel(calculatedGeometry, pureBendingForcesSet, reinforcementProperties, Concrete.valueOf(selectedConcreteClass));
         Solver pureBendingSolver = new Solver();
 
-        double[] reinforcement = pureBendingSolver.calculateReinforcement(pureBendingCalculationModel);
+        double[] reinforcement = pureBendingSolver.calculateReinforcementPureBending(pureBendingCalculationModel);
 
         double bottomReinforcementCrossSection = reinforcement[0];
         double topReinforcementCrossSection = reinforcement[1];
@@ -154,13 +155,17 @@ public class RectangularSectionBendingController {
         int numberOfBottomBars = Solver.calculateNumberOfBars(bottomReinforcementCrossSection, bottomMainBars.getBarDiameter());
         int numberOfTopBars = Solver.calculateNumberOfBars(topReinforcementCrossSection, topMainBars.getBarDiameter());
 
+        double actualBottomReinforcementCrossSection = numberOfBottomBars * (Math.PI * Math.pow(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), 2)) / (4);
+        double actualTopReinforcementCrossSection = numberOfTopBars * (Math.PI * Math.pow(Integer.parseInt(topMainBarsComboBox.getValue().toString()), 2)) / (4);
+
         //TEST
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
 
         //TODO: Add method and textFields for top reinforcement
-        bottomCalculatedReinforcementTextField.setText(twoNumbers.format(bottomReinforcementCrossSection));
+        bottomCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(bottomReinforcementCrossSection));
         bottomBarsNumberTextField.setText(Integer.valueOf(numberOfBottomBars).toString());
+        bottomActualReinforcementTextField.setText(twoDigitsAfterDecimal.format(actualBottomReinforcementCrossSection));
 
     }
 
