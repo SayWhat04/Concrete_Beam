@@ -27,8 +27,12 @@ public class Solver {
 
         Concrete concreteClassOfElement = bendingCalculationModel.getConcreteType();
 
-        double bottomReinforcementEffectiveDepth = height - bottomReinforcementCoverage - 0.5 * bottomReinforcementDiameter - stirrupsDiameter;
-        double topReinforcementEffectiveDepth = height - topReinforcementCoverage - 0.5 * topReinforcementDiameter - stirrupsDiameter;
+        //a1: distance between bottom edge of beam and center of bottom reinforcement; a2: distance between top edge of beam and center of top reinforcement;
+        double a1 = bottomReinforcementCoverage + 0.5 * bottomReinforcementDiameter + stirrupsDiameter;
+        double a2 = topReinforcementCoverage + 0.5 * topReinforcementDiameter + stirrupsDiameter;
+
+        double bottomReinforcementEffectiveDepth = height - a1;
+        double topReinforcementEffectiveDepth = height - a2;
 
         double concreteCharCompressiveStrength = concreteClassOfElement.getF_ck();
         double concreteDesignCompressiveStrength = concreteCharCompressiveStrength / Concrete.CONCRETE_PARTIAL_FACTOR;
@@ -62,7 +66,7 @@ public class Solver {
         double maxTopReinforcement = calculateMaximumReinforcementPureBending(width, topReinforcementEffectiveDepth);
 
         if (initialBendingMoment > 0) {
-            double mi = (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (width * bottomReinforcementEffectiveDepth * bottomReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
+            double mi = calculateMi(width, bendingMoment, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta);
             //TEST
             System.out.println("Mi: " + mi);
 
@@ -73,11 +77,11 @@ public class Solver {
             if (dzeta_ef <= dzeta_ef_lim) {
                 return calculateOnlyExtendedReinforcementBending(bottomReinforcementEffectiveDepth, bottomReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
             } else {
-                return calculateExtendedAndCompressedReinforcementBending(width, topReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment);
+                return calculateExtendedAndCompressedReinforcementBending(width, topReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment, a2, bottomReinforcementSteelStrengthCalc);
             }
 
         } else {
-            double mi = (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (width * topReinforcementEffectiveDepth * topReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
+            double mi = calculateMi(width, bendingMoment, topReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta);
             //TEST
             System.out.println("Mi: " + mi);
 
@@ -86,47 +90,53 @@ public class Solver {
             System.out.println("Dzeta_ef: " + dzeta_ef);
 
             if (dzeta_ef <= dzeta_ef_lim) {
-                return calculateOnlyExtendedReinforcementBending(topReinforcementEffectiveDepth, topReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
+                double[] calculatedReinforcement = calculateOnlyExtendedReinforcementBending(topReinforcementEffectiveDepth, topReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
+                //Positions of values in array had to be swapped because we need to always have bottom reinforcement in position[0] and top reinforcement in position[1]
+                double[] swappedArray = swapValuesInArray(calculatedReinforcement);
+                return swappedArray;
             } else {
-                return calculateExtendedAndCompressedReinforcementBending(width, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment);
+                double[] calculatedReinforcement = calculateExtendedAndCompressedReinforcementBending(width, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment, a1, bottomReinforcementSteelStrengthCalc);
+                //Positions of values in array had to be swapped because we need to always have bottom reinforcement in position[0] and top reinforcement in position[1]
+                double[] swappedArray = swapValuesInArray(calculatedReinforcement);
+                return swappedArray;
             }
         }
     }
 
-    private double[] calculateOnlyExtendedReinforcementBending(double extendedReinforcementEffectiveDepth, double extendedReinforcementSteelStrengthCalc, double bendingMoment, double dzeta_ef) {
+    private double[] calculateOnlyExtendedReinforcementBending(double extendedReinforcementEffectiveDepth,
+                                                               double extendedReinforcementSteelStrengthCalc,
+                                                               double bendingMoment, double dzeta_ef) {
         System.out.println("Compressed reinforcement is not needed");
 
         //Lever arm of internal forces
         double z_c = (1 - 0.5 * dzeta_ef) * extendedReinforcementEffectiveDepth;
-
         //TEST
         System.out.println("z_c: " + z_c);
 
         //As_1: extended reinforcement; As_2: compressed reinforcement;
-        double reinforcement_As_1 = (bendingMoment * 1000000) / (z_c * extendedReinforcementSteelStrengthCalc);
+        double reinforcement_As_1 = (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (z_c * extendedReinforcementSteelStrengthCalc);
         double reinforcement_As_2 = 0;
-
         double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
-
         return reinforcement;
     }
 
-    private double[] calculateExtendedAndCompressedReinforcementBending(double width, double bottomReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double eta, double dzeta_ef_lim, double bendingMoment) {
+    private double[] calculateExtendedAndCompressedReinforcementBending(double width,
+                                                                        double extendedReinforcementEffectiveDepth,
+                                                                        double concreteDesignCompressiveStrength,
+                                                                        double eta, double dzeta_ef_lim, double bendingMoment, double a2,
+                                                                        double extendedReinforcementSteelStrengthCalc) {
         System.out.println("Compressed reinforcement is needed");
 
         //  TODO: maksymalna nosnosc przekroju pojedynczo zbrojonego
-        double M_rd_pz = dzeta_ef_lim * (1 - 0.5 * dzeta_ef_lim) * width * bottomReinforcementEffectiveDepth * bottomReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength * 0.000001;
-
+        double M_rd_pz = dzeta_ef_lim * (1 - 0.5 * dzeta_ef_lim) * width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength * UnitsConverter.NEWTON_TO_KILONEWTON * UnitsConverter.MILIMETER_TO_METER;
         //TEST
         System.out.println("M_rd_pz: " + M_rd_pz);
 
-        //TODO: Replace "1" with value od a_2
-        double reinforcement_As_2 = ((bendingMoment - M_rd_pz) * 1000000) / ((bottomReinforcementEffectiveDepth - 1) * 1);
-
-        double reinforcement_As_1 = (((M_rd_pz) / ((1 - 0.5 * dzeta_ef_lim) * bottomReinforcementEffectiveDepth * 1)) * 1000000) + reinforcement_As_2;
-
+        //As_1: extended reinforcement; As_2: compressed reinforcement
+        //TODO: Add value of f_yd
+        double reinforcement_As_2 = ((bendingMoment - M_rd_pz) * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / ((extendedReinforcementEffectiveDepth - a2) * extendedReinforcementSteelStrengthCalc);
+        double reinforcement_As_1 = (((M_rd_pz) / ((1 - 0.5 * dzeta_ef_lim) * extendedReinforcementEffectiveDepth * extendedReinforcementSteelStrengthCalc)) * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) + reinforcement_As_2;
         double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
-
         return reinforcement;
     }
 
@@ -141,6 +151,10 @@ public class Solver {
         System.out.println("dzeta_ef: " + dzeta_ef);
 
         return dzeta_ef;
+    }
+
+    private double calculateMi(double width, double bendingMoment, double extendedReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double eta) {
+        return (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
     }
 
     public static int calculateNumberOfBars(double reinforcementCrossSectionArea, int barDiameter) {
@@ -159,14 +173,12 @@ public class Solver {
 
         if (Math.round(firstIterationNumberOfBars) < firstIterationNumberOfBars) {
             secondIterationNumberOfBars = (int) (Math.round(firstIterationNumberOfBars)) + 1;
-
             //TEST
             System.out.println("secondIterationNumberOfBars: " + secondIterationNumberOfBars);
 
             return secondIterationNumberOfBars;
         } else {
             secondIterationNumberOfBars = (int) (Math.round(firstIterationNumberOfBars));
-
             //TEST
             System.out.println("secondIterationNumberOfBars: " + secondIterationNumberOfBars);
 
@@ -177,6 +189,11 @@ public class Solver {
     public double calculateMaximumReinforcementPureBending(double width, double effectiveDepth) {
         double maximumReinforcementPureBending = 0.04 * width * effectiveDepth;
         return maximumReinforcementPureBending;
+    }
+
+    public double[] swapValuesInArray(double[] arrayToSwap) {
+        double[] swappedArray = {arrayToSwap[1], arrayToSwap[0]};
+        return swappedArray;
     }
 
 

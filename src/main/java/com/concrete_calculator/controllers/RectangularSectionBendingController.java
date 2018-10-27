@@ -26,50 +26,66 @@ public class RectangularSectionBendingController {
     private static final Object[] MAIN_BARS_DIAMETERS = {8, 10, 12, 14, 16, 20, 25, 28, 32, 40};
     private static final Object[] STIRRUPS_DIAMETERS = {6, 8, 10, 12};
 
+    private static final String MATCH_POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
+    private static final String MATCH_ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
+
+    //TODO: Prepare regex that matches only positive doubles that don't start with "0'
+    private static final String MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "\\d{1,7}([.]\\d{0,4})?";
+
     //TODO: Create helper Class with number formats and units
     DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("##.00");
 
     @FXML
-    TextField widthTextField;
+    private TextField widthTextField;
 
     @FXML
-    TextField heightTextField;
+    private TextField heightTextField;
 
     @FXML
-    ComboBox bottomMainBarsComboBox;
+    private ComboBox bottomMainBarsComboBox;
 
     @FXML
-    ComboBox topMainBarsComboBox;
+    private ComboBox topMainBarsComboBox;
 
     @FXML
-    ComboBox stirrupsComboBox;
+    private ComboBox stirrupsComboBox;
 
     @FXML
-    TextField bottomCoverageTextField;
+    private TextField bottomCoverageTextField;
 
     @FXML
-    TextField topCoverageTextField;
+    private TextField topCoverageTextField;
 
     @FXML
-    ComboBox<Concrete> concreteClassComboBox;
+    private ComboBox<Concrete> concreteClassComboBox;
 
     @FXML
-    ComboBox steelClassComboBox;
+    private ComboBox steelClassComboBox;
 
     @FXML
-    TextField bendingMomentTextField;
+    private TextField bendingMomentTextField;
 
     @FXML
-    TextField bottomCalculatedReinforcementTextField;
+    private TextField bottomCalculatedReinforcementTextField;
 
     @FXML
-    TextField bottomBarsNumberTextField;
+    private TextField bottomBarsNumberTextField;
 
     @FXML
-    TextField bottomActualReinforcementTextField;
+    private TextField bottomActualReinforcementTextField;
 
     @FXML
-    Button calculateButton;
+    private TextField topCalculatedReinforcementTextField;
+
+    @FXML
+    private TextField topBarsNumberTextField;
+
+    @FXML
+    private TextField topActualReinforcementTextField;
+
+    @FXML
+    private Button calculateButton;
+
 
     @FXML
     public void initialize() {
@@ -100,24 +116,26 @@ public class RectangularSectionBendingController {
         );
     }
 
+    //TODO: Redesign method to use TextFormatter instead of Listeners
     private void initListeners() {
         widthTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                if (!newValue.matches(MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
                     widthTextField.setText(oldValue);
                 }
             }
         });
         heightTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                if (!newValue.matches(MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
                     heightTextField.setText(oldValue);
                 }
             }
         });
+        //TODO: Refactor to accept positive or negative double
         bendingMomentTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches("\\d{0,7}([.]\\d{0,4})?")) {
+                if (!newValue.matches(MATCH_ANY_DOUBLE_REGEX)) {
                     bendingMomentTextField.setText(oldValue);
                 }
             }
@@ -167,7 +185,8 @@ public class RectangularSectionBendingController {
         bottomBarsNumberTextField.setText(Integer.valueOf(numberOfBottomBars).toString());
         bottomActualReinforcementTextField.setText(twoDigitsAfterDecimal.format(actualBottomReinforcementCrossSection));
 
+        topCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(topReinforcementCrossSection));
+        topBarsNumberTextField.setText(Integer.valueOf(numberOfTopBars).toString());
+        topActualReinforcementTextField.setText(twoDigitsAfterDecimal.format(actualTopReinforcementCrossSection));
     }
-
-
 }
