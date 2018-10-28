@@ -12,15 +12,15 @@
          <children>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false" text="%menu.file">
                   <items>
-                    <MenuItem fx:id="menuBarFileCloseApplication" mnemonicParsing="false" onAction="#closeApplication" text="Close" />
+                    <MenuItem fx:id="menuBarFileCloseApplication" mnemonicParsing="false" onAction="#closeApplication" text="%file.close" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit" />
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false" text="%menu.edit" />
+                <Menu mnemonicParsing="false" text="%menu.help">
                   <items>
-                    <MenuItem fx:id="menuBarHelpAboutApplication" mnemonicParsing="false" onAction="#aboutApplication" text="About" />
+                    <MenuItem fx:id="menuBarHelpAboutApplication" mnemonicParsing="false" onAction="#aboutApplication" text="%help.about" />
                   </items>
                 </Menu>
               </menus>

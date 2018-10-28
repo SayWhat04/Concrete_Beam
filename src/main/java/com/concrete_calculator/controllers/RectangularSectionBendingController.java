@@ -17,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -28,9 +27,7 @@ public class RectangularSectionBendingController {
 
     private static final String MATCH_POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
     private static final String MATCH_ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
-
-    //TODO: Prepare regex that matches only positive doubles that don't start with "0'
-    private static final String MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "\\d{1,7}([.]\\d{0,4})?";
+    private static final String MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]\\d*)([.]\\d{0,4})?";
 
     //TODO: Create helper Class with number formats and units
     DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("##.00");
@@ -86,7 +83,6 @@ public class RectangularSectionBendingController {
     @FXML
     private Button calculateButton;
 
-
     @FXML
     public void initialize() {
         fillComboBoxes();
@@ -116,7 +112,7 @@ public class RectangularSectionBendingController {
         );
     }
 
-    //TODO: Redesign method to use TextFormatter instead of Listeners
+    //TODO: Redesign method to use TextFormatter instead of Listeners?
     private void initListeners() {
         widthTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -132,7 +128,6 @@ public class RectangularSectionBendingController {
                 }
             }
         });
-        //TODO: Refactor to accept positive or negative double
         bendingMomentTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 if (!newValue.matches(MATCH_ANY_DOUBLE_REGEX)) {
@@ -143,7 +138,6 @@ public class RectangularSectionBendingController {
     }
 
     public void calculateBending() {
-
         Section rectangularSection = new RectangularSection(Double.parseDouble(heightTextField.getText()), Double.parseDouble(widthTextField.getText()));
         Geometry calculatedGeometry = new Geometry(rectangularSection, 5000);
 
@@ -165,11 +159,9 @@ public class RectangularSectionBendingController {
 
         double bottomReinforcementCrossSection = reinforcement[0];
         double topReinforcementCrossSection = reinforcement[1];
-
         //TEST
         System.out.println(Arrays.toString(reinforcement));
 
-        //TEST: Calculate number of bars
         int numberOfBottomBars = Solver.calculateNumberOfBars(bottomReinforcementCrossSection, bottomMainBars.getBarDiameter());
         int numberOfTopBars = Solver.calculateNumberOfBars(topReinforcementCrossSection, topMainBars.getBarDiameter());
 
@@ -180,11 +172,9 @@ public class RectangularSectionBendingController {
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
 
-        //TODO: Add method and textFields for top reinforcement
         bottomCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(bottomReinforcementCrossSection));
         bottomBarsNumberTextField.setText(Integer.valueOf(numberOfBottomBars).toString());
         bottomActualReinforcementTextField.setText(twoDigitsAfterDecimal.format(actualBottomReinforcementCrossSection));
-
         topCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(topReinforcementCrossSection));
         topBarsNumberTextField.setText(Integer.valueOf(numberOfTopBars).toString());
         topActualReinforcementTextField.setText(twoDigitsAfterDecimal.format(actualTopReinforcementCrossSection));
