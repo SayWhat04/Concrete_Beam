@@ -17,20 +17,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class RectangularSectionBendingController {
 
+    //Values in [mm]
     private static final Object[] MAIN_BARS_DIAMETERS = {8, 10, 12, 14, 16, 20, 25, 28, 32, 40};
     private static final Object[] STIRRUPS_DIAMETERS = {6, 8, 10, 12};
 
-    private static final String MATCH_POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
-    private static final String MATCH_ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
-    private static final String MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]\\d*)([.]\\d{0,4})?";
+    private static final String POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
+    private static final String ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
+    private static final String POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]\\d*)([.]\\d{0,4})?";
+    private static final String POSITIVE_TWO_DIGITS_INTEGER = "^[1-9]{1,2}?$";
 
     //TODO: Create helper Class with number formats and units
-    DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("##.00");
+    DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("#0.00");
 
     @FXML
     private TextField widthTextField;
@@ -57,7 +60,7 @@ public class RectangularSectionBendingController {
     private ComboBox<Concrete> concreteClassComboBox;
 
     @FXML
-    private ComboBox steelClassComboBox;
+    private ComboBox<Steel> steelClassComboBox;
 
     @FXML
     private TextField bendingMomentTextField;
@@ -116,21 +119,21 @@ public class RectangularSectionBendingController {
     private void initListeners() {
         widthTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches(MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
+                if (!newValue.matches(POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
                     widthTextField.setText(oldValue);
                 }
             }
         });
         heightTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches(MATCH_POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
+                if (!newValue.matches(POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
                     heightTextField.setText(oldValue);
                 }
             }
         });
         bendingMomentTextField.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches(MATCH_ANY_DOUBLE_REGEX)) {
+                if (!newValue.matches(ANY_DOUBLE_REGEX)) {
                     bendingMomentTextField.setText(oldValue);
                 }
             }
