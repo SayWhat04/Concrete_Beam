@@ -1,14 +1,18 @@
 package com.concrete_calculator.geometry;
 
-public interface Section {
+public abstract class Section {
 
-    double calculateArea();
+    public abstract double calculateArea();
 
-    double calculateMomentOfInertiaX();
+    public abstract double calculateMomentOfInertiaX();
 
-    double calculateMomentOfInertiaY();
+    public abstract double calculateMomentOfInertiaY();
 
-    double getHeight();
+    public abstract double getHeight();
 
-    double getWidth();
+    public abstract double getWidth();
+
+    public abstract double getFlangeHeight();
+
+    public abstract double getFlangeWidth();
 }

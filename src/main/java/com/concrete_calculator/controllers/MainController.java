@@ -1,9 +1,13 @@
 package com.concrete_calculator.controllers;
 
+import com.concrete_calculator.utils.DialogUtils;
 import com.concrete_calculator.utils.FxmlUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
+
+import java.util.Optional;
 
 public class MainController {
 
@@ -23,12 +27,14 @@ public class MainController {
     }
 
     public void closeApplication() {
-        //TODO: Add popup asking if user really wants to exit
-
-        Platform.exit();
-        System.exit(0);
+        Optional<ButtonType> result = DialogUtils.confirmationDialog();
+        if (result.get() == ButtonType.OK) {
+            Platform.exit();
+            System.exit(0);
+        }
     }
 
     public void aboutApplication() {
+        DialogUtils.dialogAboutApplication();
     }
 }

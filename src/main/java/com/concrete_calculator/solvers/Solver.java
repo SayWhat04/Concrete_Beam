@@ -7,7 +7,7 @@ import com.concrete_calculator.materials.Steel;
 
 public class Solver {
 
-    public double[] calculateReinforcementPureBending(CalculationModel bendingCalculationModel) {
+    public double[] calculateReinforcementPureBendingRectangularSection(CalculationModel bendingCalculationModel) {
 
         double height = bendingCalculationModel.getElementGeometry().getSection().getHeight();
         double width = bendingCalculationModel.getElementGeometry().getSection().getWidth();
@@ -103,13 +103,129 @@ public class Solver {
         }
     }
 
+    public double[] calculateReinforcementPureBendingTSection(CalculationModel bendingCalculationModel) {
+        double height = bendingCalculationModel.getElementGeometry().getSection().getHeight();
+        double width = bendingCalculationModel.getElementGeometry().getSection().getWidth();
+        double flangeWidth = bendingCalculationModel.getElementGeometry().getSection().getFlangeWidth();
+        double flangeHeight = bendingCalculationModel.getElementGeometry().getSection().getFlangeHeight();
+
+        double initialBendingMoment = bendingCalculationModel.getForcesSet().getBendingMoment();
+        //For Calculation we need absolute value of BendingMoment
+        double bendingMoment = Math.abs(initialBendingMoment);
+
+        double bottomReinforcementDiameter = bendingCalculationModel.getReinforcementProperties().getBottomReinforcement().getBarDiameter();
+        double topReinforcementDiameter = bendingCalculationModel.getReinforcementProperties().getTopReinforcement().getBarDiameter();
+        double stirrupsDiameter = bendingCalculationModel.getReinforcementProperties().getStirrup().getBarDiameter();
+        Steel bottomReinforcementSteelType = bendingCalculationModel.getReinforcementProperties().getBottomReinforcement().getSteelType();
+        Steel topReinforcementSteelType = bendingCalculationModel.getReinforcementProperties().getTopReinforcement().getSteelType();
+        Steel stirrupsSteelType = bendingCalculationModel.getReinforcementProperties().getStirrup().getSteelType();
+        double bottomReinforcementCoverage = bendingCalculationModel.getReinforcementProperties().getBottomCoverage();
+        double topReinforcementCoverage = bendingCalculationModel.getReinforcementProperties().getTopCoverage();
+
+        Concrete concreteClassOfElement = bendingCalculationModel.getConcreteType();
+
+        //a1: distance between bottom edge of beam and center of bottom reinforcement; a2: distance between top edge of beam and center of top reinforcement;
+        double a1 = bottomReinforcementCoverage + 0.5 * bottomReinforcementDiameter + stirrupsDiameter;
+        double a2 = topReinforcementCoverage + 0.5 * topReinforcementDiameter + stirrupsDiameter;
+
+        double bottomReinforcementEffectiveDepth = height - a1;
+        double topReinforcementEffectiveDepth = height - a2;
+
+        double concreteCharCompressiveStrength = concreteClassOfElement.getF_ck();
+        double concreteDesignCompressiveStrength = concreteCharCompressiveStrength / Concrete.CONCRETE_PARTIAL_FACTOR;
+
+        double bottomReinforcementSteelStrengthChar = bottomReinforcementSteelType.getF_yk();
+        double bottomReinforcementSteelStrengthCalc = bottomReinforcementSteelStrengthChar / Steel.STEEL_PARTIAL_FACTOR;
+
+        double topReinforcementSteelStrengthChar = topReinforcementSteelType.getF_yk();
+        double topReinforcementSteelStrengthCalc = topReinforcementSteelStrengthChar / Steel.STEEL_PARTIAL_FACTOR;
+
+        double eta = concreteClassOfElement.getEta();
+        double dzeta_ef_lim = concreteClassOfElement.getDzeta_ef_lim();
+
+        //TEST
+        System.out.println("M_Ed: " + initialBendingMoment);
+        System.out.println("h: " + height);
+        System.out.println("b: " + width);
+        System.out.println("d_bottom: " + bottomReinforcementEffectiveDepth);
+        System.out.println("d_top: " + topReinforcementEffectiveDepth);
+        System.out.println("concreteCharCompressiveStrength: " + concreteCharCompressiveStrength);
+        System.out.println("concreteDesignCompressiveStrength: " + concreteDesignCompressiveStrength);
+        System.out.println("bottomReinforcementSteelStrengthChar: " + bottomReinforcementSteelStrengthChar);
+        System.out.println("bottomReinforcementSteelStrengthCalc: " + bottomReinforcementSteelStrengthCalc);
+        System.out.println("topReinforcementSteelStrengthChar: " + topReinforcementSteelStrengthChar);
+        System.out.println("topReinforcementSteelStrengthCalc: " + topReinforcementSteelStrengthCalc);
+        System.out.println("Eta: " + eta);
+        System.out.println("Dzeta_ef_lim: " + dzeta_ef_lim);
+
+        if (initialBendingMoment > 0) {
+            double mi = calculateMi(flangeWidth, bendingMoment, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta);
+            //TEST
+            System.out.println("Mi: " + mi);
+
+            double dzeta_ef = calculateDzeta_ef(mi);
+            //TEST
+            System.out.println("Dzeta_ef: " + dzeta_ef);
+
+            double tSectionFactor = checkIfSectionIsRealTSection(flangeHeight, bottomReinforcementEffectiveDepth);
+
+            if (tSectionFactor >= dzeta_ef) {
+                System.out.println("Section is not real T-Section");
+                if (dzeta_ef <= dzeta_ef_lim) {
+                    System.out.println("Compressed reinforcement is not needed");
+                    return calculateOnlyExtendedReinforcementBending(bottomReinforcementEffectiveDepth, bottomReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
+
+                } else {
+                    System.out.println("Compressed reinforcement is needed");
+                    //TODO: Check if this part is necessary!!!!!
+                }
+
+
+            } else {
+                System.out.println("Section is real T-Section");
+                if (dzeta_ef <= dzeta_ef_lim) {
+                    System.out.println("Compressed reinforcement is not needed");
+                    return calculateExtendedReinforcementTSection(width, flangeWidth, flangeHeight, bendingMoment, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, bottomReinforcementSteelStrengthCalc, eta);
+                } else {
+                    System.out.println("Compressed reinforcement is needed");
+                    double[] extendedReinforcement = calculateExtendedReinforcementTSection(width, flangeWidth, flangeHeight, bendingMoment, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, bottomReinforcementSteelStrengthCalc, eta);
+                    //TODO: Make sure that value of width is correct!!!
+                    double[] compressedReinforcement = calculateExtendedAndCompressedReinforcementBending(width, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment, a2, bottomReinforcementSteelStrengthCalc);
+                    double[] extendedAndCompressedReinforcement = {extendedReinforcement[0], compressedReinforcement[1]};
+                    return extendedAndCompressedReinforcement;
+                }
+            }
+
+
+        } else {
+            //TODO:
+        }
+
+
+        //TODO:
+        return null;
+    }
+
+    private double[] calculateExtendedReinforcementTSection(double width, double flangeWidth, double flangeHeight, double bendingMoment, double bottomReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double bottomReinforcementSteelStrengthCalc, double eta) {
+        //TODO: Nośność skrzydeł płyty
+        double M_Rd_f = flangeHeight * (flangeWidth - width) * eta * concreteDesignCompressiveStrength * (bottomReinforcementEffectiveDepth - 0.5 * flangeHeight);
+        double bendingMomentsDifference = bendingMoment - M_Rd_f;
+        double newMi = calculateMi(width, bendingMomentsDifference, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta);
+        double newDzeta_ef = calculateDzeta_ef(newMi);
+        double z_c = calculateLeverArmOfInternalForces(bottomReinforcementEffectiveDepth, newDzeta_ef);
+        double reinforcement_As_1 = flangeHeight * (flangeWidth - width) * ((eta * concreteDesignCompressiveStrength) / (bottomReinforcementSteelStrengthCalc)) + ((bendingMoment - M_Rd_f) / (z_c * bottomReinforcementSteelStrengthCalc));
+        double reinforcement_As_2 = 0;
+        double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
+        return reinforcement;
+    }
+
     private double[] calculateOnlyExtendedReinforcementBending(double extendedReinforcementEffectiveDepth,
                                                                double extendedReinforcementSteelStrengthCalc,
                                                                double bendingMoment, double dzeta_ef) {
         System.out.println("Compressed reinforcement is not needed");
 
         //Lever arm of internal forces
-        double z_c = (1 - 0.5 * dzeta_ef) * extendedReinforcementEffectiveDepth;
+        double z_c = calculateLeverArmOfInternalForces(extendedReinforcementEffectiveDepth, dzeta_ef);
         //TEST
         System.out.println("z_c: " + z_c);
 
@@ -157,6 +273,15 @@ public class Solver {
         return (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
     }
 
+    private double calculateLeverArmOfInternalForces(double extendedReinforcementEffectiveDepth, double dzeta_ef) {
+        return (1 - 0.5 * dzeta_ef) * extendedReinforcementEffectiveDepth;
+    }
+
+    private double checkIfSectionIsRealTSection(double flangeHeight, double bottomReinforcementEffectiveDepth) {
+        double tSectionFactor = flangeHeight / bottomReinforcementEffectiveDepth;
+        return tSectionFactor;
+    }
+
     public static int calculateNumberOfBars(double reinforcementCrossSectionArea, int barDiameter) {
 
         //TEST
@@ -195,6 +320,4 @@ public class Solver {
         double[] swappedArray = {arrayToSwap[1], arrayToSwap[0]};
         return swappedArray;
     }
-
-
 }

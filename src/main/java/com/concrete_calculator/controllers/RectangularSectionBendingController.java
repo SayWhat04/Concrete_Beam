@@ -29,7 +29,7 @@ public class RectangularSectionBendingController {
 
     private static final String POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
     private static final String ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
-    private static final String POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]\\d*)([.]\\d{0,4})?";
+    private static final String POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]| \\d*)([.]\\d{0,4})?";
     private static final String POSITIVE_TWO_DIGITS_INTEGER = "^[1-9]{1,2}?$";
 
     //TODO: Create helper Class with number formats and units
@@ -40,6 +40,9 @@ public class RectangularSectionBendingController {
 
     @FXML
     private TextField heightTextField;
+
+    @FXML
+    private TextField lengthTextField;
 
     @FXML
     private ComboBox bottomMainBarsComboBox;
@@ -104,6 +107,7 @@ public class RectangularSectionBendingController {
     private void initBindings() {
         calculateButton.disableProperty().bind(Bindings.isEmpty(widthTextField.textProperty())
                 .or(Bindings.isEmpty(heightTextField.textProperty()))
+                .or(Bindings.isEmpty(lengthTextField.textProperty()))
                 .or(Bindings.isNull(bottomMainBarsComboBox.valueProperty()))
                 .or(Bindings.isNull(topMainBarsComboBox.valueProperty()))
                 .or(Bindings.isNull(stirrupsComboBox.valueProperty()))
@@ -142,7 +146,7 @@ public class RectangularSectionBendingController {
 
     public void calculateBending() {
         Section rectangularSection = new RectangularSection(Double.parseDouble(heightTextField.getText()), Double.parseDouble(widthTextField.getText()));
-        Geometry calculatedGeometry = new Geometry(rectangularSection, 5000);
+        Geometry calculatedGeometry = new Geometry(rectangularSection, Double.parseDouble(lengthTextField.getText()));
 
         ForcesSet pureBendingForcesSet = new ForcesSet();
         pureBendingForcesSet.setBendingMoment(Double.parseDouble(bendingMomentTextField.getText()));
@@ -158,7 +162,7 @@ public class RectangularSectionBendingController {
         CalculationModel pureBendingCalculationModel = new CalculationModel(calculatedGeometry, pureBendingForcesSet, reinforcementProperties, Concrete.valueOf(selectedConcreteClass));
         Solver pureBendingSolver = new Solver();
 
-        double[] reinforcement = pureBendingSolver.calculateReinforcementPureBending(pureBendingCalculationModel);
+        double[] reinforcement = pureBendingSolver.calculateReinforcementPureBendingRectangularSection(pureBendingCalculationModel);
 
         double bottomReinforcementCrossSection = reinforcement[0];
         double topReinforcementCrossSection = reinforcement[1];

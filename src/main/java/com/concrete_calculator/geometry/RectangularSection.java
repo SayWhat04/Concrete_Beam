@@ -1,6 +1,6 @@
 package com.concrete_calculator.geometry;
 
-public class RectangularSection implements Section {
+public class RectangularSection extends Section {
     private double height;
     private double width;
 
@@ -27,5 +27,13 @@ public class RectangularSection implements Section {
 
     public double getWidth() {
         return width;
+    }
+
+    public double getFlangeHeight() {
+        return 0;
+    }
+
+    public double getFlangeWidth() {
+        return 0;
     }
 }

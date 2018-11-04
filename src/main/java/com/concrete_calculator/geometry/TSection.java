@@ -1,6 +1,6 @@
 package com.concrete_calculator.geometry;
 
-public class TSection implements Section {
+public class TSection extends Section {
 
     private double height;
     private double width;
@@ -8,10 +8,11 @@ public class TSection implements Section {
     private double flangeWidth;
     private double webHeight = height - flangeHeight;
 
-    public TSection(double height, double width, double flangeHeight) {
+    public TSection(double height, double width, double flangeHeight, double flangeWidth) {
         this.height = height;
         this.width = width;
         this.flangeHeight = flangeHeight;
+        this.flangeWidth = flangeWidth;
     }
 
     public double calculateArea() {
@@ -22,6 +23,7 @@ public class TSection implements Section {
     public double calculateMomentOfInertiaX() {
         return 0;
     }
+
     public double calculateMomentOfInertiaY() {
         return 0;
     }

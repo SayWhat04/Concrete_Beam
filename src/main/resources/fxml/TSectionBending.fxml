@@ -74,6 +74,8 @@
             <Label text="%top.actual.reinforcement" GridPane.columnIndex="3" GridPane.rowIndex="13" />
             <Label text="%length" GridPane.rowIndex="3" />
             <TextField fx:id="lengthTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label prefHeight="17.0" prefWidth="66.0" text="%flange.width" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <TextField fx:id="flangeWidthTextField" GridPane.columnIndex="4" GridPane.rowIndex="1" />
          </children>
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="160.0" />

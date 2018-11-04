@@ -6,7 +6,8 @@ import javafx.scene.layout.BorderPane;
 
 public class BendingWindowController {
 
-    public static final String RECTANGULAR_SECTION_BENDING_FXML = "/fxml/RectangularSectionBending.fxml";
+    private static final String RECTANGULAR_SECTION_BENDING_FXML = "/fxml/RectangularSectionBending.fxml";
+    private static final String T_SECTION_BENDING_FXML = "/fxml/TSectionBending.fxml";
 
     @FXML
     BorderPane bendingBorderPane;
@@ -16,5 +17,6 @@ public class BendingWindowController {
     }
 
     public void openTSectionBending() {
+        bendingBorderPane.setCenter(FxmlUtils.fxmlLoader(T_SECTION_BENDING_FXML));
     }
 }
