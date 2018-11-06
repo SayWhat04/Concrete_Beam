@@ -171,15 +171,8 @@ public class Solver {
 
             if (tSectionFactor >= dzeta_ef) {
                 System.out.println("Section is not real T-Section");
-                if (dzeta_ef <= dzeta_ef_lim) {
-                    System.out.println("Compressed reinforcement is not needed");
-                    return calculateOnlyExtendedReinforcementBending(bottomReinforcementEffectiveDepth, bottomReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
-
-                } else {
-                    System.out.println("Compressed reinforcement is needed");
-                    //TODO: Check if this part is necessary!!!!!
-                }
-
+                System.out.println("Compressed reinforcement is not needed");
+                return calculateOnlyExtendedReinforcementBending(bottomReinforcementEffectiveDepth, bottomReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
 
             } else {
                 System.out.println("Section is real T-Section");
@@ -195,15 +188,27 @@ public class Solver {
                     return extendedAndCompressedReinforcement;
                 }
             }
-
-
         } else {
-            //TODO:
+            double mi = calculateMi(width, bendingMoment, topReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta);
+            //TEST
+            System.out.println("Mi: " + mi);
+
+            double dzeta_ef = calculateDzeta_ef(mi);
+            //TEST
+            System.out.println("Dzeta_ef: " + dzeta_ef);
+
+            if (dzeta_ef <= dzeta_ef_lim) {
+                double[] calculatedReinforcement = calculateOnlyExtendedReinforcementBending(topReinforcementEffectiveDepth, topReinforcementSteelStrengthCalc, bendingMoment, dzeta_ef);
+                //Positions of values in array had to be swapped because we need to always have bottom reinforcement in position[0] and top reinforcement in position[1]
+                double[] swappedArray = swapValuesInArray(calculatedReinforcement);
+                return swappedArray;
+            } else {
+                double[] calculatedReinforcement = calculateExtendedAndCompressedReinforcementBending(width, bottomReinforcementEffectiveDepth, concreteDesignCompressiveStrength, eta, dzeta_ef_lim, bendingMoment, a1, topReinforcementSteelStrengthCalc);
+                //Positions of values in array had to be swapped because we need to always have bottom reinforcement in position[0] and top reinforcement in position[1]
+                double[] swappedArray = swapValuesInArray(calculatedReinforcement);
+                return swappedArray;
+            }
         }
-
-
-        //TODO:
-        return null;
     }
 
     private double[] calculateExtendedReinforcementTSection(double width, double flangeWidth, double flangeHeight, double bendingMoment, double bottomReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double bottomReinforcementSteelStrengthCalc, double eta) {
