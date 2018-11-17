@@ -3,7 +3,7 @@ package com.concrete_calculator.models;
 public class ForcesSet {
 
     double bendingMoment;
-    double sheerForce;
+    double shearForce;
     double axialForce;
     double torqMoment;
 
@@ -11,8 +11,8 @@ public class ForcesSet {
         return bendingMoment;
     }
 
-    public double getSheerForce() {
-        return sheerForce;
+    public double getShearForce() {
+        return shearForce;
     }
 
     public double getAxialForce() {
@@ -27,8 +27,8 @@ public class ForcesSet {
         this.bendingMoment = bendingMoment;
     }
 
-    public void setSheerForce(double sheerForce) {
-        this.sheerForce = sheerForce;
+    public void setShearForce(double shearForce) {
+        this.shearForce = shearForce;
     }
 
     public void setAxialForce(double axialForce) {

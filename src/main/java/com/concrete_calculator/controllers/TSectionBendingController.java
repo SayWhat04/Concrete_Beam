@@ -1,14 +1,15 @@
 package com.concrete_calculator.controllers;
 
-import com.concrete_calculator.models.CalculationModel;
-import com.concrete_calculator.models.ForcesSet;
-import com.concrete_calculator.reinforcement.ReinforcementProperties;
 import com.concrete_calculator.geometry.Geometry;
 import com.concrete_calculator.geometry.RectangularSection;
 import com.concrete_calculator.geometry.Section;
+import com.concrete_calculator.geometry.TSection;
 import com.concrete_calculator.materials.Concrete;
-import com.concrete_calculator.reinforcement.Rebar;
 import com.concrete_calculator.materials.Steel;
+import com.concrete_calculator.models.CalculationModel;
+import com.concrete_calculator.models.ForcesSet;
+import com.concrete_calculator.reinforcement.Rebar;
+import com.concrete_calculator.reinforcement.ReinforcementProperties;
 import com.concrete_calculator.solvers.Solver;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -21,7 +22,7 @@ import javafx.scene.control.TextField;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
-public class RectangularSectionBendingController {
+public class TSectionBendingController {
 
     //Values in [mm]
     private static final Object[] MAIN_BARS_DIAMETERS = {8, 10, 12, 14, 16, 20, 25, 28, 32, 40};
@@ -43,6 +44,12 @@ public class RectangularSectionBendingController {
 
     @FXML
     private TextField lengthTextField;
+
+    @FXML
+    private TextField flangeWidthTextField;
+
+    @FXML
+    private TextField flangeHeightTextField;
 
     @FXML
     private ComboBox bottomMainBarsComboBox;
@@ -108,6 +115,8 @@ public class RectangularSectionBendingController {
         calculateButton.disableProperty().bind(Bindings.isEmpty(widthTextField.textProperty())
                 .or(Bindings.isEmpty(heightTextField.textProperty()))
                 .or(Bindings.isEmpty(lengthTextField.textProperty()))
+                .or(Bindings.isEmpty(flangeWidthTextField.textProperty()))
+                .or(Bindings.isEmpty(flangeHeightTextField.textProperty()))
                 .or(Bindings.isNull(bottomMainBarsComboBox.valueProperty()))
                 .or(Bindings.isNull(topMainBarsComboBox.valueProperty()))
                 .or(Bindings.isNull(stirrupsComboBox.valueProperty()))
@@ -145,8 +154,9 @@ public class RectangularSectionBendingController {
     }
 
     public void calculateBending() {
-        Section rectangularSection = new RectangularSection(Double.parseDouble(heightTextField.getText()), Double.parseDouble(widthTextField.getText()));
-        Geometry calculatedGeometry = new Geometry(rectangularSection, Double.parseDouble(lengthTextField.getText()));
+        //TODO:Verify if method is working
+        Section tSection = new TSection(Double.parseDouble(heightTextField.getText()), Double.parseDouble(widthTextField.getText()), Double.parseDouble(flangeHeightTextField.getText()), Double.parseDouble(flangeWidthTextField.getText()));
+        Geometry calculatedGeometry = new Geometry(tSection, Double.parseDouble(lengthTextField.getText()));
 
         ForcesSet pureBendingForcesSet = new ForcesSet();
         pureBendingForcesSet.setBendingMoment(Double.parseDouble(bendingMomentTextField.getText()));
@@ -162,7 +172,7 @@ public class RectangularSectionBendingController {
         CalculationModel pureBendingCalculationModel = new CalculationModel(calculatedGeometry, pureBendingForcesSet, reinforcementProperties, Concrete.valueOf(selectedConcreteClass));
         Solver pureBendingSolver = new Solver();
 
-        double[] reinforcement = pureBendingSolver.calculateReinforcementPureBendingRectangularSection(pureBendingCalculationModel);
+        double[] reinforcement = pureBendingSolver.calculateReinforcementPureBendingTSection(pureBendingCalculationModel);
 
         double bottomReinforcementCrossSection = reinforcement[0];
         double topReinforcementCrossSection = reinforcement[1];

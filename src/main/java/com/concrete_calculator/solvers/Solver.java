@@ -1,12 +1,13 @@
 package com.concrete_calculator.solvers;
 
-import com.concrete_calculator.UnitsConverter;
+import com.concrete_calculator.Constants;
 import com.concrete_calculator.models.CalculationModel;
 import com.concrete_calculator.materials.Concrete;
 import com.concrete_calculator.materials.Steel;
 
 public class Solver {
 
+    //MAIN CALCULATION METHODS
     public double[] calculateReinforcementPureBendingRectangularSection(CalculationModel bendingCalculationModel) {
 
         double height = bendingCalculationModel.getElementGeometry().getSection().getHeight();
@@ -211,6 +212,37 @@ public class Solver {
         }
     }
 
+    public double calculateReinforcementShearRectangularSection(CalculationModel shearCalculationModel) {
+
+        double height = shearCalculationModel.getElementGeometry().getSection().getHeight();
+        double width = shearCalculationModel.getElementGeometry().getSection().getWidth();
+
+        double shearForce = shearCalculationModel.getForcesSet().getShearForce();
+
+        double stirrupsDiameter = shearCalculationModel.getReinforcementProperties().getStirrup().getBarDiameter();
+        Steel stirrupsSteelType = shearCalculationModel.getReinforcementProperties().getStirrup().getSteelType();
+        double stirrupsSteelStrengthChar = stirrupsSteelType.getF_yk();
+        double stirrupsSteelStrengthCalc = stirrupsSteelStrengthChar / Steel.STEEL_PARTIAL_FACTOR;
+
+        Concrete concreteClassOfElement = shearCalculationModel.getConcreteType();
+        double concreteCharCompressiveStrength = concreteClassOfElement.getF_ck();
+        double concreteDesignCompressiveStrength = concreteCharCompressiveStrength / Concrete.CONCRETE_PARTIAL_FACTOR;
+
+        //TEST
+        System.out.println("V_Ed: " + shearForce);
+        System.out.println("h: " + height);
+        System.out.println("b: " + width);
+        System.out.println("concreteCharCompressiveStrength: " + concreteCharCompressiveStrength);
+        System.out.println("concreteDesignCompressiveStrength: " + concreteDesignCompressiveStrength);
+        System.out.println("stirrupsSteelStrengthChar: " + stirrupsSteelStrengthChar);
+        System.out.println("stirrupsSteelStrengthCalc: " + stirrupsSteelStrengthCalc);
+
+
+        return 1.0;
+    }
+
+
+    //BENDING CALCULATION HELPER METHODS
     private double[] calculateExtendedReinforcementTSection(double width, double flangeWidth, double flangeHeight, double bendingMoment, double bottomReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double bottomReinforcementSteelStrengthCalc, double eta) {
         //TODO: Nośność skrzydeł płyty
         double M_Rd_f = flangeHeight * (flangeWidth - width) * eta * concreteDesignCompressiveStrength * (bottomReinforcementEffectiveDepth - 0.5 * flangeHeight);
@@ -235,7 +267,7 @@ public class Solver {
         System.out.println("z_c: " + z_c);
 
         //As_1: extended reinforcement; As_2: compressed reinforcement;
-        double reinforcement_As_1 = (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (z_c * extendedReinforcementSteelStrengthCalc);
+        double reinforcement_As_1 = (bendingMoment * Constants.KILONEWTON_TO_NEWTON * Constants.METER_TO_MILIMETER) / (z_c * extendedReinforcementSteelStrengthCalc);
         double reinforcement_As_2 = 0;
         double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
         return reinforcement;
@@ -249,33 +281,20 @@ public class Solver {
         System.out.println("Compressed reinforcement is needed");
 
         //  TODO: maksymalna nosnosc przekroju pojedynczo zbrojonego
-        double M_rd_pz = dzeta_ef_lim * (1 - 0.5 * dzeta_ef_lim) * width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength * UnitsConverter.NEWTON_TO_KILONEWTON * UnitsConverter.MILIMETER_TO_METER;
+        double M_rd_pz = dzeta_ef_lim * (1 - 0.5 * dzeta_ef_lim) * width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength * Constants.NEWTON_TO_KILONEWTON * Constants.MILIMETER_TO_METER;
         //TEST
         System.out.println("M_rd_pz: " + M_rd_pz);
 
         //As_1: extended reinforcement; As_2: compressed reinforcement
         //TODO: Add value of f_yd
-        double reinforcement_As_2 = ((bendingMoment - M_rd_pz) * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / ((extendedReinforcementEffectiveDepth - a2) * extendedReinforcementSteelStrengthCalc);
-        double reinforcement_As_1 = (((M_rd_pz) / ((1 - 0.5 * dzeta_ef_lim) * extendedReinforcementEffectiveDepth * extendedReinforcementSteelStrengthCalc)) * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) + reinforcement_As_2;
+        double reinforcement_As_2 = ((bendingMoment - M_rd_pz) * Constants.KILONEWTON_TO_NEWTON * Constants.METER_TO_MILIMETER) / ((extendedReinforcementEffectiveDepth - a2) * extendedReinforcementSteelStrengthCalc);
+        double reinforcement_As_1 = (((M_rd_pz) / ((1 - 0.5 * dzeta_ef_lim) * extendedReinforcementEffectiveDepth * extendedReinforcementSteelStrengthCalc)) * Constants.KILONEWTON_TO_NEWTON * Constants.METER_TO_MILIMETER) + reinforcement_As_2;
         double[] reinforcement = {reinforcement_As_1, reinforcement_As_2};
         return reinforcement;
     }
 
-    private double calculateDzeta_ef(double mi) {
-        double firstStep = 2.0 * mi;
-        System.out.println("firstStep: " + firstStep);
-        double secondStep = 1.0 - firstStep;
-        System.out.println("secondStep: " + secondStep);
-        double thirdStep = Math.sqrt(secondStep);
-        System.out.println("thirdStep: " + thirdStep);
-        double dzeta_ef = 1.0 - thirdStep;
-        System.out.println("dzeta_ef: " + dzeta_ef);
-
-        return dzeta_ef;
-    }
-
     private double calculateMi(double width, double bendingMoment, double extendedReinforcementEffectiveDepth, double concreteDesignCompressiveStrength, double eta) {
-        return (bendingMoment * UnitsConverter.KILONEWTON_TO_NEWTON * UnitsConverter.METER_TO_MILIMETER) / (width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
+        return (bendingMoment * Constants.KILONEWTON_TO_NEWTON * Constants.METER_TO_MILIMETER) / (width * extendedReinforcementEffectiveDepth * extendedReinforcementEffectiveDepth * eta * concreteDesignCompressiveStrength);
     }
 
     private double calculateLeverArmOfInternalForces(double extendedReinforcementEffectiveDepth, double dzeta_ef) {
@@ -285,6 +304,11 @@ public class Solver {
     private double checkIfSectionIsRealTSection(double flangeHeight, double bottomReinforcementEffectiveDepth) {
         double tSectionFactor = flangeHeight / bottomReinforcementEffectiveDepth;
         return tSectionFactor;
+    }
+
+    public double calculateMaximumReinforcementPureBending(double width, double effectiveDepth) {
+        double maximumReinforcementPureBending = 0.04 * width * effectiveDepth;
+        return maximumReinforcementPureBending;
     }
 
     public static int calculateNumberOfBars(double reinforcementCrossSectionArea, int barDiameter) {
@@ -316,9 +340,54 @@ public class Solver {
         }
     }
 
-    public double calculateMaximumReinforcementPureBending(double width, double effectiveDepth) {
-        double maximumReinforcementPureBending = 0.04 * width * effectiveDepth;
-        return maximumReinforcementPureBending;
+    //SHEAR CALCULATION HELPER METHODS
+    public double calculateDistanceOnWhichShearReinforcementIsNeeded(double designShearForce, double designShearResistanceWithoutReinforcement, double linearLoad) {
+        double distance = (designShearForce - designShearResistanceWithoutReinforcement) / linearLoad;
+        return distance;
+    }
+
+    //TODO: Method for checking if shear reinforcement is needed
+    public boolean isShearReinforcementNeeded() {
+        return false;
+    }
+
+    public double calculateShear_k_Factor(double effectiveDepth) {
+        double kFactor = Math.sqrt(200 / effectiveDepth);
+
+        if (kFactor > 2) {
+            return 2.0;
+        } else {
+            return kFactor;
+        }
+    }
+
+    public double calculateShear_Ni_Min(double kFactor, double steelStrengthChar) {
+        double ni_Min = 0.035 * Math.sqrt(Math.pow(kFactor, 3)) * Math.sqrt(steelStrengthChar);
+        return ni_Min;
+    }
+
+    //OTHER HELPERS
+    private double calculateDzeta_ef(double mi) {
+        double firstStep = 2.0 * mi;
+        System.out.println("firstStep: " + firstStep);
+        double secondStep = 1.0 - firstStep;
+        System.out.println("secondStep: " + secondStep);
+        double thirdStep = Math.sqrt(secondStep);
+        System.out.println("thirdStep: " + thirdStep);
+        double dzeta_ef = 1.0 - thirdStep;
+        System.out.println("dzeta_ef: " + dzeta_ef);
+
+        return dzeta_ef;
+    }
+
+    public double calculateReinforcementRatio(double reinforcementCrossSectionalArea, double concreteCrossSectionalArea) {
+        double reinforcementRatio = reinforcementCrossSectionalArea / concreteCrossSectionalArea;
+
+        if (reinforcementRatio > 0.02) {
+            return 0.02;
+        } else {
+            return reinforcementRatio;
+        }
     }
 
     public double[] swapValuesInArray(double[] arrayToSwap) {

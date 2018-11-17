@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="TOP_CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.concrete_calculator.controllers.RectangularSectionBendingController">
+<VBox alignment="TOP_CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.concrete_calculator.controllers.TSectionBendingController">
    <children>
       <GridPane>
          <children>
@@ -76,6 +76,8 @@
             <TextField fx:id="lengthTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label prefHeight="17.0" prefWidth="66.0" text="%flange.width" GridPane.columnIndex="3" GridPane.rowIndex="1" />
             <TextField fx:id="flangeWidthTextField" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Label text="%flange.height" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <TextField fx:id="flangeHeightTextField" GridPane.columnIndex="4" GridPane.rowIndex="2" />
          </children>
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="160.0" />

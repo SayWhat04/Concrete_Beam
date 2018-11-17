@@ -1,6 +1,6 @@
 package com.concrete_calculator;
 
-public class UnitsConverter {
+public class Constants {
     //DISTANCE
     public static final double METER_TO_CENTIMETER = 100;
     public static final double METER_TO_MILIMETER = 1000;
@@ -11,4 +11,7 @@ public class UnitsConverter {
     public static final double NEWTON_TO_KILONEWTON = 0.001;
     //AREA
     public static final double SQUAREMILIMETERS_TO_SQUARECENTIMETERS = 0.01;
+
+    //SHEAR
+    public static final double SHEAR_FACTOR_k_l_ = 0.15;
 }
