@@ -1,5 +1,7 @@
 package com.concrete_calculator;
 
+import com.concrete_calculator.materials.Concrete;
+
 public class Constants {
     //DISTANCE
     public static final double METER_TO_CENTIMETER = 100;
@@ -14,4 +16,5 @@ public class Constants {
 
     //SHEAR
     public static final double SHEAR_FACTOR_k_l_ = 0.15;
+    public static final double SHEAR_FACTOR_C_Rd_c = 0.18 / Concrete.CONCRETE_PARTIAL_FACTOR;
 }

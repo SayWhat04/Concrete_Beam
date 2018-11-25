@@ -47,7 +47,9 @@ public class Solver {
         double eta = concreteClassOfElement.getEta();
         double dzeta_ef_lim = concreteClassOfElement.getDzeta_ef_lim();
 
-        //TEST
+
+        System.out.println("Eta: " + eta);
+        System.out.println("Dzeta_ef_lim: " + dzeta_ef_lim);        //TEST
         System.out.println("M_Ed: " + initialBendingMoment);
         System.out.println("h: " + height);
         System.out.println("b: " + width);
@@ -59,8 +61,6 @@ public class Solver {
         System.out.println("bottomReinforcementSteelStrengthCalc: " + bottomReinforcementSteelStrengthCalc);
         System.out.println("topReinforcementSteelStrengthChar: " + topReinforcementSteelStrengthChar);
         System.out.println("topReinforcementSteelStrengthCalc: " + topReinforcementSteelStrengthCalc);
-        System.out.println("Eta: " + eta);
-        System.out.println("Dzeta_ef_lim: " + dzeta_ef_lim);
 
         //TODO: Think about implementation of methods for checking maximum and minimum reinforcement
         double maxBottomReinforcement = calculateMaximumReinforcementPureBending(width, bottomReinforcementEffectiveDepth);
@@ -218,9 +218,25 @@ public class Solver {
         double width = shearCalculationModel.getElementGeometry().getSection().getWidth();
 
         double shearForce = shearCalculationModel.getForcesSet().getShearForce();
+        double axialForce = shearCalculationModel.getForcesSet().getAxialForce();
 
+        double bottomReinforcementDiameter = shearCalculationModel.getReinforcementProperties().getBottomReinforcement().getBarDiameter();
+        double topReinforcementDiameter = shearCalculationModel.getReinforcementProperties().getTopReinforcement().getBarDiameter();
         double stirrupsDiameter = shearCalculationModel.getReinforcementProperties().getStirrup().getBarDiameter();
+
+        Steel bottomReinforcementSteelType = shearCalculationModel.getReinforcementProperties().getBottomReinforcement().getSteelType();
+        Steel topReinforcementSteelType = shearCalculationModel.getReinforcementProperties().getTopReinforcement().getSteelType();
         Steel stirrupsSteelType = shearCalculationModel.getReinforcementProperties().getStirrup().getSteelType();
+        double bottomReinforcementCoverage = shearCalculationModel.getReinforcementProperties().getBottomCoverage();
+        double topReinforcementCoverage = shearCalculationModel.getReinforcementProperties().getTopCoverage();
+
+        //a1: distance between bottom edge of beam and center of bottom reinforcement; a2: distance between top edge of beam and center of top reinforcement;
+        double a1 = bottomReinforcementCoverage + 0.5 * bottomReinforcementDiameter + stirrupsDiameter;
+        double a2 = topReinforcementCoverage + 0.5 * topReinforcementDiameter + stirrupsDiameter;
+
+        double bottomReinforcementEffectiveDepth = height - a1;
+        double topReinforcementEffectiveDepth = height - a2;
+
         double stirrupsSteelStrengthChar = stirrupsSteelType.getF_yk();
         double stirrupsSteelStrengthCalc = stirrupsSteelStrengthChar / Steel.STEEL_PARTIAL_FACTOR;
 
@@ -232,10 +248,12 @@ public class Solver {
         System.out.println("V_Ed: " + shearForce);
         System.out.println("h: " + height);
         System.out.println("b: " + width);
+        System.out.println("d_bottom: " + bottomReinforcementEffectiveDepth);
+        System.out.println("d_top: " + topReinforcementEffectiveDepth);
         System.out.println("concreteCharCompressiveStrength: " + concreteCharCompressiveStrength);
         System.out.println("concreteDesignCompressiveStrength: " + concreteDesignCompressiveStrength);
-        System.out.println("stirrupsSteelStrengthChar: " + stirrupsSteelStrengthChar);
-        System.out.println("stirrupsSteelStrengthCalc: " + stirrupsSteelStrengthCalc);
+
+        double shearResistanceWithoutReinforcement = calculateShearResistance();
 
 
         return 1.0;
@@ -347,8 +365,34 @@ public class Solver {
     }
 
     //TODO: Method for checking if shear reinforcement is needed
-    public boolean isShearReinforcementNeeded() {
-        return false;
+    public double calculateShearResistance(double effectiveDepth,
+                                           double extendedReinforcementCrossSectionArea,
+                                           double width, double height,
+                                           double axialForce,
+                                           double concreteCharCompressiveStrength,
+                                           double concreteDesignCompressiveStrength) {
+
+        double C_Rd_c = Constants.SHEAR_FACTOR_C_Rd_c;
+        double k_Factor = calculateShear_k_Factor(effectiveDepth);
+        //TODO: Add getter of area
+        double extendedSectionArea = width * effectiveDepth;
+        double sectionCrossArea = width * height;
+        double extendedReinforcementRatio = calculateReinforcementRatio(extendedReinforcementCrossSectionArea, extendedSectionArea);
+        double compressiveStressFromAxialForce = calculateCompressiveStressFromAxialForce(axialForce, sectionCrossArea, concreteDesignCompressiveStrength);
+        double ni_Min = calculateShear_Ni_Min(k_Factor, concreteCharCompressiveStrength);
+        double k_l_Factor = Constants.SHEAR_FACTOR_k_l_;
+
+        //Main calculation
+        double shearResistance1 = (C_Rd_c * k_Factor * Math.cbrt(100 * extendedReinforcementRatio * concreteCharCompressiveStrength) + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth;
+        double shearResistance2 = (ni_Min + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth;
+
+        //TODO: Check is this is correct
+        if(shearResistance1<shearResistance2){
+            return shearResistance2;
+        }
+        else{
+            return shearResistance1;
+        }
     }
 
     public double calculateShear_k_Factor(double effectiveDepth) {
@@ -361,9 +405,19 @@ public class Solver {
         }
     }
 
-    public double calculateShear_Ni_Min(double kFactor, double steelStrengthChar) {
-        double ni_Min = 0.035 * Math.sqrt(Math.pow(kFactor, 3)) * Math.sqrt(steelStrengthChar);
+    public double calculateShear_Ni_Min(double kFactor, double concreteStrengthChar) {
+        double ni_Min = 0.035 * Math.sqrt(Math.pow(kFactor, 3)) * Math.sqrt(concreteStrengthChar);
         return ni_Min;
+    }
+
+    public double calculateCompressiveStressFromAxialForce(double axialForce, double sectionCrossArea, double concreteDesignCompressiveStrength) {
+        double compressiveStress = (Constants.KILONEWTON_TO_NEWTON * axialForce) / (sectionCrossArea);
+
+        if (compressiveStress > 0.2 * concreteDesignCompressiveStrength) {
+            return 0.2 * concreteDesignCompressiveStrength;
+        } else {
+            return compressiveStress;
+        }
     }
 
     //OTHER HELPERS
@@ -393,5 +447,10 @@ public class Solver {
     public double[] swapValuesInArray(double[] arrayToSwap) {
         double[] swappedArray = {arrayToSwap[1], arrayToSwap[0]};
         return swappedArray;
+    }
+
+    //TODO: Refactor naming of variables + check if it is actually working
+    public int roundUpToNearestSelectedValue(double i, int v) {
+        return (int) (Math.ceil(i / v) * v);
     }
 }
