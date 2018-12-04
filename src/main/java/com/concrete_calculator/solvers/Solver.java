@@ -240,9 +240,15 @@ public class Solver {
         double stirrupsSteelStrengthChar = stirrupsSteelType.getF_yk();
         double stirrupsSteelStrengthCalc = stirrupsSteelStrengthChar / Steel.STEEL_PARTIAL_FACTOR;
 
+        double bottomReinforcementCrossSection = shearCalculationModel.getReinforcementProperties().getBottomReinforcementCrossSection();
+        //TODO: Method for calculation of stirrups Cross Section
+        double stirrupsCrossSection = shearCalculationModel.getReinforcementProperties().getStirrupsCrossSection();
+
         Concrete concreteClassOfElement = shearCalculationModel.getConcreteType();
         double concreteCharCompressiveStrength = concreteClassOfElement.getF_ck();
         double concreteDesignCompressiveStrength = concreteCharCompressiveStrength / Concrete.CONCRETE_PARTIAL_FACTOR;
+
+        double thetaAngle = shearCalculationModel.getReinforcementProperties().getThetaAngleShear();
 
         //TEST
         System.out.println("V_Ed: " + shearForce);
@@ -253,10 +259,20 @@ public class Solver {
         System.out.println("concreteCharCompressiveStrength: " + concreteCharCompressiveStrength);
         System.out.println("concreteDesignCompressiveStrength: " + concreteDesignCompressiveStrength);
 
-        double shearResistanceWithoutReinforcement = calculateShearResistance();
+        double shearResistanceWithoutReinforcement = calculateShearResistance(bottomReinforcementEffectiveDepth,
+                bottomReinforcementCrossSection, width, height, axialForce, concreteCharCompressiveStrength, concreteDesignCompressiveStrength);
 
-
-        return 1.0;
+        if (shearForce >= shearResistanceWithoutReinforcement) {
+            //TODO: Calculate shear reinforcement
+            double spacing = calculateStirrupsSpacing(shearForce, thetaAngle, stirrupsSteelStrengthCalc, bottomReinforcementEffectiveDepth, stirrupsCrossSection);
+            int roundedSpacing = roundUpToNearestSelectedValue(spacing, 10);
+            return roundedSpacing;
+        } else {
+            //TODO: Calculate reqiurement span of reinforcement
+            double spacing = 0.75 * bottomReinforcementEffectiveDepth;
+            int roundedSpacing = roundUpToNearestSelectedValue(spacing, 10);
+            return roundedSpacing;
+        }
     }
 
 
@@ -364,7 +380,7 @@ public class Solver {
         return distance;
     }
 
-    //TODO: Method for checking if shear reinforcement is needed
+    //TODO: Refactor to accept less arguments
     public double calculateShearResistance(double effectiveDepth,
                                            double extendedReinforcementCrossSectionArea,
                                            double width, double height,
@@ -387,10 +403,9 @@ public class Solver {
         double shearResistance2 = (ni_Min + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth;
 
         //TODO: Check is this is correct
-        if(shearResistance1<shearResistance2){
+        if (shearResistance1 < shearResistance2) {
             return shearResistance2;
-        }
-        else{
+        } else {
             return shearResistance1;
         }
     }
@@ -420,6 +435,12 @@ public class Solver {
         }
     }
 
+    public double calculateStirrupsSpacing(double shearForce, double thetaAngle, double steelStrengthCalc, double effectiveDepth, double stirrupsCrossSectionArea) {
+        double coTanTheta = 1.0 / Math.tan(thetaAngle);
+        double stirrupsSpan = (stirrupsCrossSectionArea * steelStrengthCalc * 0.9 * effectiveDepth * coTanTheta) / (shearForce * Constants.KILONEWTON_TO_NEWTON);
+        return stirrupsSpan;
+    }
+
     //OTHER HELPERS
     private double calculateDzeta_ef(double mi) {
         double firstStep = 2.0 * mi;
@@ -444,13 +465,17 @@ public class Solver {
         }
     }
 
+    public double calculateCrossSectionAreaOfStirrups(int stirrupsDiameter, int numberOfStirrupsArm) {
+        return (Math.PI * Math.pow(stirrupsDiameter, 2) * numberOfStirrupsArm) / (4);
+    }
+
     public double[] swapValuesInArray(double[] arrayToSwap) {
         double[] swappedArray = {arrayToSwap[1], arrayToSwap[0]};
         return swappedArray;
     }
 
     //TODO: Refactor naming of variables + check if it is actually working
-    public int roundUpToNearestSelectedValue(double i, int v) {
-        return (int) (Math.ceil(i / v) * v);
+    public int roundUpToNearestSelectedValue(double numberToRound, int accuracy) {
+        return (int) (Math.ceil(numberToRound / accuracy) * accuracy);
     }
 }

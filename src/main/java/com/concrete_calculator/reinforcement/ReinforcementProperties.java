@@ -8,7 +8,16 @@ public class ReinforcementProperties {
     double bottomCoverage;
     double topCoverage;
 
-    //TODO: Add Stirrups to implementation
+    double bottomReinforcementCrossSection;
+    double topReinforcementCrossSection;
+    double stirrupsCrossSection;
+
+    int bottomReinforcementQuantity;
+    int topReinforcementQuantity;
+    int stirrupsNumberOfArms;
+
+    double thetaAngleShear;
+
     public ReinforcementProperties(Rebar bottomReinforcement, Rebar topReinforcement, Rebar stirrup, double bottomCoverage, double topCoverage) {
         this.bottomReinforcement = bottomReinforcement;
         this.topReinforcement = topReinforcement;
@@ -55,5 +64,37 @@ public class ReinforcementProperties {
 
     public void setStirrup(Rebar stirrup) {
         this.stirrup = stirrup;
+    }
+
+    public double getBottomReinforcementCrossSection() {
+        return bottomReinforcementCrossSection;
+    }
+
+    public void setBottomReinforcementCrossSection(double bottomReinforcementCrossSection) {
+        this.bottomReinforcementCrossSection = bottomReinforcementCrossSection;
+    }
+
+    public double getTopReinforcementCrossSection() {
+        return topReinforcementCrossSection;
+    }
+
+    public void setTopReinforcementCrossSection(double topReinforcementCrossSection) {
+        this.topReinforcementCrossSection = topReinforcementCrossSection;
+    }
+
+    public double getThetaAngleShear() {
+        return thetaAngleShear;
+    }
+
+    public void setThetaAngleShear(double thetaAngleShear) {
+        this.thetaAngleShear = thetaAngleShear;
+    }
+
+    public double getStirrupsCrossSection() {
+        return stirrupsCrossSection;
+    }
+
+    public void setStirrupsCrossSection(double stirrupsCrossSection) {
+        this.stirrupsCrossSection = stirrupsCrossSection;
     }
 }
