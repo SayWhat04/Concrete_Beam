@@ -154,6 +154,8 @@ public class RectangularSectionShearController {
 
         double numberOfBottomBars =Double.parseDouble(bottomBarsQuantityTextField.getText());
         double numberOfTopBars =Double.parseDouble(topBarsQuantityTextField.getText());
+        //TODO: Remove magic number!!!!!! Make Text Field for stirrups arms
+        double numberOfStirrupArms = 2;
 
         Rebar bottomMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(bottomMainBarsComboBox.getValue().toString()));
         Rebar topMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(topMainBarsComboBox.getValue().toString()));
@@ -161,7 +163,15 @@ public class RectangularSectionShearController {
         double bottomReinforcementCoverage = Double.parseDouble(bottomCoverageTextField.getText());
         double topReinforcementCoverage = Double.parseDouble(topCoverageTextField.getText());
         ReinforcementProperties reinforcementProperties = new ReinforcementProperties(bottomMainBars, topMainBars, stirrups, bottomReinforcementCoverage, topReinforcementCoverage);
+
         reinforcementProperties.setThetaAngleShear(Double.parseDouble(thetaAngleTextField.getText()));
+        double bottomReinforcementCrossSection = numberOfBottomBars * (Math.PI * Math.pow(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), 2)) / (4);
+        double topReinforcementCrossSection = numberOfTopBars * (Math.PI * Math.pow(Integer.parseInt(topMainBarsComboBox.getValue().toString()), 2)) / (4);
+        double stirrupCrossSection = numberOfStirrupArms * (Math.PI * Math.pow(Integer.parseInt(stirrupsComboBox.getValue().toString()), 2)) / (4);
+
+        reinforcementProperties.setBottomReinforcementCrossSection(bottomReinforcementCrossSection);
+        reinforcementProperties.setTopReinforcementCrossSection(topReinforcementCrossSection);
+        reinforcementProperties.setStirrupsCrossSection(stirrupCrossSection);
 
         String selectedConcreteClass = concreteClassComboBox.getValue().toString();
         CalculationModel shearCalculationModel = new CalculationModel(calculatedGeometry, shearForcesSet, reinforcementProperties, Concrete.valueOf(selectedConcreteClass));
@@ -170,12 +180,8 @@ public class RectangularSectionShearController {
         double shearReinforcementSpan = shearSolver.calculateReinforcementShearRectangularSection(shearCalculationModel);
 
         //TEST
+        System.out.println("********************* "+new Object(){}.getClass().getEnclosingMethod().getName()+" ************************************");
         System.out.println("Shear reinforcement span: " + shearReinforcementSpan);
-
-        double bottomReinforcementCrossSection = numberOfBottomBars * (Math.PI * Math.pow(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), 2)) / (4);
-        double topReinforcementCrossSection = numberOfTopBars * (Math.PI * Math.pow(Integer.parseInt(topMainBarsComboBox.getValue().toString()), 2)) / (4);
-
-        //TEST
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
 

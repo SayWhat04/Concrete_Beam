@@ -251,6 +251,8 @@ public class Solver {
         double thetaAngle = shearCalculationModel.getReinforcementProperties().getThetaAngleShear();
 
         //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
         System.out.println("V_Ed: " + shearForce);
         System.out.println("h: " + height);
         System.out.println("b: " + width);
@@ -261,6 +263,9 @@ public class Solver {
 
         double shearResistanceWithoutReinforcement = calculateShearResistance(bottomReinforcementEffectiveDepth,
                 bottomReinforcementCrossSection, width, height, axialForce, concreteCharCompressiveStrength, concreteDesignCompressiveStrength);
+
+        //TEST
+        System.out.println("Shear Resistance Without Reinforcement: " + shearResistanceWithoutReinforcement);
 
         if (shearForce >= shearResistanceWithoutReinforcement) {
             //TODO: Calculate shear reinforcement
@@ -398,9 +403,25 @@ public class Solver {
         double ni_Min = calculateShear_Ni_Min(k_Factor, concreteCharCompressiveStrength);
         double k_l_Factor = Constants.SHEAR_FACTOR_k_l_;
 
-        //Main calculation
-        double shearResistance1 = (C_Rd_c * k_Factor * Math.cbrt(100 * extendedReinforcementRatio * concreteCharCompressiveStrength) + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth;
-        double shearResistance2 = (ni_Min + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth;
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("C_Rd_c :" + C_Rd_c);
+        System.out.println("k_Factor: " + k_Factor);
+        System.out.println("extendedSectionArea: " + extendedSectionArea);
+        System.out.println("sectionCrossArea: " + sectionCrossArea);
+        System.out.println("extendedReinforcementRatio: " + extendedReinforcementRatio);
+        System.out.println("compressiveStressFromAxialForce: " + compressiveStressFromAxialForce);
+        System.out.println("ni_Min: " + ni_Min);
+        System.out.println("k_l_Factor: " + k_l_Factor);
+        System.out.println("concreteCharCompressiveStrength: " + concreteCharCompressiveStrength);
+
+        double shearResistance1 = (C_Rd_c * k_Factor * Math.cbrt(100 * extendedReinforcementRatio * concreteCharCompressiveStrength) + k_l_Factor * compressiveStressFromAxialForce) * width * Constants.NEWTON_TO_KILONEWTON;
+        double shearResistance2 = (ni_Min + k_l_Factor * compressiveStressFromAxialForce) * width * effectiveDepth * Constants.NEWTON_TO_KILONEWTON;
+
+        //TEST
+        System.out.println("shearResistance1:" + shearResistance1);
+        System.out.println("shearResistance2: " + shearResistance2);
 
         //TODO: Check is this is correct
         if (shearResistance1 < shearResistance2) {
@@ -413,6 +434,11 @@ public class Solver {
     public double calculateShear_k_Factor(double effectiveDepth) {
         double kFactor = Math.sqrt(200 / effectiveDepth);
 
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("kFactor:" + kFactor);
+
         if (kFactor > 2) {
             return 2.0;
         } else {
@@ -422,11 +448,22 @@ public class Solver {
 
     public double calculateShear_Ni_Min(double kFactor, double concreteStrengthChar) {
         double ni_Min = 0.035 * Math.sqrt(Math.pow(kFactor, 3)) * Math.sqrt(concreteStrengthChar);
+
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("ni_Min:" + ni_Min);
+
         return ni_Min;
     }
 
     public double calculateCompressiveStressFromAxialForce(double axialForce, double sectionCrossArea, double concreteDesignCompressiveStrength) {
         double compressiveStress = (Constants.KILONEWTON_TO_NEWTON * axialForce) / (sectionCrossArea);
+
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("compressiveStress:" + compressiveStress);
 
         if (compressiveStress > 0.2 * concreteDesignCompressiveStrength) {
             return 0.2 * concreteDesignCompressiveStrength;
@@ -436,8 +473,17 @@ public class Solver {
     }
 
     public double calculateStirrupsSpacing(double shearForce, double thetaAngle, double steelStrengthCalc, double effectiveDepth, double stirrupsCrossSectionArea) {
-        double coTanTheta = 1.0 / Math.tan(thetaAngle);
+        double thetaAngleInRadians = (Math.PI*thetaAngle)/(180);
+        double coTanTheta = 1.0 / Math.tan(thetaAngleInRadians);
         double stirrupsSpan = (stirrupsCrossSectionArea * steelStrengthCalc * 0.9 * effectiveDepth * coTanTheta) / (shearForce * Constants.KILONEWTON_TO_NEWTON);
+
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("stirrupsCrossSectionArea:" + stirrupsCrossSectionArea);
+        System.out.println("coTanTheta:" + coTanTheta);
+        System.out.println("stirrupsSpan:" + stirrupsSpan);
+
         return stirrupsSpan;
     }
 
@@ -457,6 +503,12 @@ public class Solver {
 
     public double calculateReinforcementRatio(double reinforcementCrossSectionalArea, double concreteCrossSectionalArea) {
         double reinforcementRatio = reinforcementCrossSectionalArea / concreteCrossSectionalArea;
+
+        //TEST
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
+        System.out.println("reinforcementCrossSectionalArea:" + reinforcementCrossSectionalArea);
+        System.out.println("reinforcementRatio:" + reinforcementRatio);
 
         if (reinforcementRatio > 0.02) {
             return 0.02;
