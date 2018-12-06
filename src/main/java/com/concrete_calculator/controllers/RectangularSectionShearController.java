@@ -10,6 +10,7 @@ import com.concrete_calculator.models.ForcesSet;
 import com.concrete_calculator.reinforcement.Rebar;
 import com.concrete_calculator.reinforcement.ReinforcementProperties;
 import com.concrete_calculator.solvers.Solver;
+import com.concrete_calculator.utils.CalculationUtils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,7 +20,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 
 public class RectangularSectionShearController {
 
@@ -156,9 +156,9 @@ public class RectangularSectionShearController {
         shearForcesSet.setShearForce(Double.parseDouble(shearForceTextField.getText()));
         shearForcesSet.setAxialForce(Double.parseDouble(axialForceTextField.getText()));
 
-        double numberOfBottomBars = Double.parseDouble(bottomBarsQuantityTextField.getText());
-        double numberOfTopBars = Double.parseDouble(topBarsQuantityTextField.getText());
-        double numberOfStirrupArms =Double.parseDouble(stirrupArmsTextField.getText());
+        int numberOfBottomBars = Integer.parseInt(bottomBarsQuantityTextField.getText());
+        int numberOfTopBars = Integer.parseInt(topBarsQuantityTextField.getText());
+        int numberOfStirrupArms = Integer.parseInt(stirrupArmsTextField.getText());
 
         Rebar bottomMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(bottomMainBarsComboBox.getValue().toString()));
         Rebar topMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(topMainBarsComboBox.getValue().toString()));
@@ -168,9 +168,9 @@ public class RectangularSectionShearController {
         ReinforcementProperties reinforcementProperties = new ReinforcementProperties(bottomMainBars, topMainBars, stirrups, bottomReinforcementCoverage, topReinforcementCoverage);
 
         reinforcementProperties.setThetaAngleShear(Double.parseDouble(thetaAngleTextField.getText()));
-        double bottomReinforcementCrossSection = numberOfBottomBars * (Math.PI * Math.pow(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), 2)) / (4);
-        double topReinforcementCrossSection = numberOfTopBars * (Math.PI * Math.pow(Integer.parseInt(topMainBarsComboBox.getValue().toString()), 2)) / (4);
-        double stirrupCrossSection = numberOfStirrupArms * (Math.PI * Math.pow(Integer.parseInt(stirrupsComboBox.getValue().toString()), 2)) / (4);
+        double bottomReinforcementCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), numberOfBottomBars);
+        double topReinforcementCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(topMainBarsComboBox.getValue().toString()), numberOfTopBars);
+        double stirrupCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(stirrupsComboBox.getValue().toString()),numberOfStirrupArms );
 
         reinforcementProperties.setBottomReinforcementCrossSection(bottomReinforcementCrossSection);
         reinforcementProperties.setTopReinforcementCrossSection(topReinforcementCrossSection);

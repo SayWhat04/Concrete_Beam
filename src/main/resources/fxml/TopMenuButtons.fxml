@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -12,7 +13,7 @@
          </toggleGroup>
       </ToggleButton>
       <ToggleButton fx:id="topMenuButtonShear" mnemonicParsing="false" onAction="#openCalculationShear" prefHeight="40.0" prefWidth="100.0" text="%shear" toggleGroup="$topButtonsToggleGroup" />
-      <ToggleButton fx:id="topMenuButtonTorsion" mnemonicParsing="false" onAction="#openCalculationTorsion" prefHeight="40.0" prefWidth="100.0" text="%torsion" toggleGroup="$topButtonsToggleGroup" />
+      <ToggleButton fx:id="topMenuButtonTorsion" disable="true" mnemonicParsing="false" onAction="#openCalculationTorsion" prefHeight="40.0" prefWidth="100.0" text="%torsion" toggleGroup="$topButtonsToggleGroup" />
    </children>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

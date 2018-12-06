@@ -2,7 +2,6 @@ package com.concrete_calculator.utils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-
 import java.util.Optional;
 import java.util.ResourceBundle;
 

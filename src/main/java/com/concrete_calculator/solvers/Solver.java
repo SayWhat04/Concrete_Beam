@@ -4,6 +4,8 @@ import com.concrete_calculator.Constants;
 import com.concrete_calculator.models.CalculationModel;
 import com.concrete_calculator.materials.Concrete;
 import com.concrete_calculator.materials.Steel;
+import static com.concrete_calculator.utils.CalculationUtils.roundUpToNearestSelectedValue;
+import static com.concrete_calculator.utils.CalculationUtils.swapValuesInArray;
 
 public class Solver {
 
@@ -47,9 +49,9 @@ public class Solver {
         double eta = concreteClassOfElement.getEta();
         double dzeta_ef_lim = concreteClassOfElement.getDzeta_ef_lim();
 
-
+        //TEST
         System.out.println("Eta: " + eta);
-        System.out.println("Dzeta_ef_lim: " + dzeta_ef_lim);        //TEST
+        System.out.println("Dzeta_ef_lim: " + dzeta_ef_lim);
         System.out.println("M_Ed: " + initialBendingMoment);
         System.out.println("h: " + height);
         System.out.println("b: " + width);
@@ -213,7 +215,6 @@ public class Solver {
     }
 
     public double calculateReinforcementShearRectangularSection(CalculationModel shearCalculationModel) {
-
         double height = shearCalculationModel.getElementGeometry().getSection().getHeight();
         double width = shearCalculationModel.getElementGeometry().getSection().getWidth();
 
@@ -515,19 +516,5 @@ public class Solver {
         } else {
             return reinforcementRatio;
         }
-    }
-
-    public double calculateCrossSectionAreaOfStirrups(int stirrupsDiameter, int numberOfStirrupsArm) {
-        return (Math.PI * Math.pow(stirrupsDiameter, 2) * numberOfStirrupsArm) / (4);
-    }
-
-    public double[] swapValuesInArray(double[] arrayToSwap) {
-        double[] swappedArray = {arrayToSwap[1], arrayToSwap[0]};
-        return swappedArray;
-    }
-
-    //TODO: Refactor naming of variables + check if it is actually working
-    public int roundUpToNearestSelectedValue(double numberToRound, int accuracy) {
-        return (int) (Math.ceil(numberToRound / accuracy) * accuracy);
     }
 }
