@@ -66,6 +66,9 @@ public class RectangularSectionShearController {
     private TextField bottomBarsQuantityTextField;
 
     @FXML
+    private TextField stirrupArmsTextField;
+
+    @FXML
     private TextField topBarsQuantityTextField;
 
     @FXML
@@ -117,6 +120,7 @@ public class RectangularSectionShearController {
                 .or(Bindings.isNull(topMainBarsComboBox.valueProperty()))
                 .or(Bindings.isEmpty(topBarsQuantityTextField.textProperty()))
                 .or(Bindings.isNull(stirrupsComboBox.valueProperty()))
+                .or(Bindings.isEmpty(stirrupArmsTextField.textProperty()))
                 .or(Bindings.isEmpty(bottomCoverageTextField.textProperty()))
                 .or(Bindings.isEmpty(topCoverageTextField.textProperty()))
                 .or(Bindings.isNull(concreteClassComboBox.valueProperty()))
@@ -152,10 +156,9 @@ public class RectangularSectionShearController {
         shearForcesSet.setShearForce(Double.parseDouble(shearForceTextField.getText()));
         shearForcesSet.setAxialForce(Double.parseDouble(axialForceTextField.getText()));
 
-        double numberOfBottomBars =Double.parseDouble(bottomBarsQuantityTextField.getText());
-        double numberOfTopBars =Double.parseDouble(topBarsQuantityTextField.getText());
-        //TODO: Remove magic number!!!!!! Make Text Field for stirrups arms
-        double numberOfStirrupArms = 2;
+        double numberOfBottomBars = Double.parseDouble(bottomBarsQuantityTextField.getText());
+        double numberOfTopBars = Double.parseDouble(topBarsQuantityTextField.getText());
+        double numberOfStirrupArms =Double.parseDouble(stirrupArmsTextField.getText());
 
         Rebar bottomMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(bottomMainBarsComboBox.getValue().toString()));
         Rebar topMainBars = new Rebar(Steel.valueOf(steelClassComboBox.getValue().toString()), Integer.parseInt(topMainBarsComboBox.getValue().toString()));
@@ -180,7 +183,8 @@ public class RectangularSectionShearController {
         double shearReinforcementSpan = shearSolver.calculateReinforcementShearRectangularSection(shearCalculationModel);
 
         //TEST
-        System.out.println("********************* "+new Object(){}.getClass().getEnclosingMethod().getName()+" ************************************");
+        System.out.println("********************* " + new Object() {
+        }.getClass().getEnclosingMethod().getName() + " ************************************");
         System.out.println("Shear reinforcement span: " + shearReinforcementSpan);
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
