@@ -269,15 +269,11 @@ public class Solver {
         System.out.println("Shear Resistance Without Reinforcement: " + shearResistanceWithoutReinforcement);
 
         if (shearForce >= shearResistanceWithoutReinforcement) {
-            //TODO: Calculate shear reinforcement
             double spacing = calculateStirrupsSpacing(shearForce, thetaAngle, stirrupsSteelStrengthCalc, bottomReinforcementEffectiveDepth, stirrupsCrossSection);
-            int roundedSpacing = roundUpToNearestSelectedValue(spacing, 10);
-            return roundedSpacing;
+            return roundUpToNearestSelectedValue(spacing, 10);
         } else {
-            //TODO: Calculate reqiurement span of reinforcement
             double spacing = 0.75 * bottomReinforcementEffectiveDepth;
-            int roundedSpacing = roundUpToNearestSelectedValue(spacing, 10);
-            return roundedSpacing;
+            return roundUpToNearestSelectedValue(spacing, 10);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.concrete_calculator.controllers;
 
+import com.concrete_calculator.Constants;
+import com.concrete_calculator.RegExps;
 import com.concrete_calculator.geometry.Geometry;
 import com.concrete_calculator.geometry.RectangularSection;
 import com.concrete_calculator.geometry.Section;
@@ -12,28 +14,12 @@ import com.concrete_calculator.reinforcement.ReinforcementProperties;
 import com.concrete_calculator.solvers.Solver;
 import com.concrete_calculator.utils.CalculationUtils;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import java.text.DecimalFormat;
-
 public class RectangularSectionShearController {
-
-    //Values in [mm]
-    private static final Object[] MAIN_BARS_DIAMETERS = {8, 10, 12, 14, 16, 20, 25, 28, 32, 40};
-    private static final Object[] STIRRUPS_DIAMETERS = {6, 8, 10, 12};
-
-    private static final String POSITIVE_DOUBLE_REGEX = "\\d{0,7}([.]\\d{0,4})?";
-    private static final String ANY_DOUBLE_REGEX = "-?(([1-9][0-9]*)|0)?(\\.[0-9]*)?";
-    private static final String POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX = "(^[1-9]| \\d*)([.]\\d{0,4})?";
-    private static final String POSITIVE_TWO_DIGITS_INTEGER = "^[1-9]{1,2}?$";
-
-    //TODO: Create helper Class with number formats and units
-    DecimalFormat twoDigitsAfterDecimal = new DecimalFormat("#0.00");
 
     @FXML
     private TextField widthTextField;
@@ -99,13 +85,13 @@ public class RectangularSectionShearController {
     public void initialize() {
         fillComboBoxes();
         initBindings();
-        //initListeners();
+        initListeners();
     }
 
     private void fillComboBoxes() {
-        bottomMainBarsComboBox.getItems().addAll(MAIN_BARS_DIAMETERS);
-        topMainBarsComboBox.getItems().addAll(MAIN_BARS_DIAMETERS);
-        stirrupsComboBox.getItems().addAll(STIRRUPS_DIAMETERS);
+        bottomMainBarsComboBox.getItems().addAll(Constants.MAIN_BARS_DIAMETERS);
+        topMainBarsComboBox.getItems().addAll(Constants.MAIN_BARS_DIAMETERS);
+        stirrupsComboBox.getItems().addAll(Constants.STIRRUPS_DIAMETERS);
         concreteClassComboBox.getItems().setAll(Concrete.values());
         steelClassComboBox.getItems().setAll(Steel.values());
     }
@@ -127,23 +113,66 @@ public class RectangularSectionShearController {
                 .or(Bindings.isNull(steelClassComboBox.valueProperty()))
                 .or(Bindings.isEmpty(axialForceTextField.textProperty()))
                 .or(Bindings.isEmpty(shearForceTextField.textProperty()))
+                .or(thetaAngleTextField.textProperty().greaterThan(Constants.THETA_ANGLE_MAX))
+                .or(thetaAngleTextField.textProperty().lessThan(Constants.THETA_ANGLE_MIN))
+                .or(thetaAngleTextField.textProperty().length().lessThan(2))
         );
     }
 
-    //TODO: Redesign method to use TextFormatter instead of Listeners?
     private void initListeners() {
-        widthTextField.textProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches(POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
-                    widthTextField.setText(oldValue);
-                }
+        widthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_INTEGER)) {
+                widthTextField.setText(oldValue);
             }
         });
-        heightTextField.textProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!newValue.matches(POSITIVE_DOUBLE_NOT_STARTING_WITH_ZERO_REGEX)) {
-                    heightTextField.setText(oldValue);
-                }
+        heightTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_INTEGER)) {
+                heightTextField.setText(oldValue);
+            }
+        });
+        lengthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_INTEGER)) {
+                lengthTextField.setText(oldValue);
+            }
+        });
+        thetaAngleTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_DOUBLE_REGEX)) {
+                thetaAngleTextField.setText(oldValue);
+            }
+        });
+        bottomBarsQuantityTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_TWO_DIGITS_INTEGER)) {
+                bottomBarsQuantityTextField.setText(oldValue);
+            }
+        });
+        topBarsQuantityTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_TWO_DIGITS_INTEGER)) {
+                topBarsQuantityTextField.setText(oldValue);
+            }
+        });
+        stirrupArmsTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_TWO_DIGITS_INTEGER)) {
+                stirrupArmsTextField.setText(oldValue);
+            }
+        });
+        bottomCoverageTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_TWO_DIGITS_INTEGER)) {
+                bottomCoverageTextField.setText(oldValue);
+            }
+        });
+        topCoverageTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_TWO_DIGITS_INTEGER)) {
+                topCoverageTextField.setText(oldValue);
+            }
+        });
+        axialForceTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_DOUBLE_REGEX)) {
+                axialForceTextField.setText(oldValue);
+            }
+        });
+        shearForceTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(RegExps.POSITIVE_DOUBLE_REGEX)) {
+                shearForceTextField.setText(oldValue);
             }
         });
     }
@@ -170,7 +199,7 @@ public class RectangularSectionShearController {
         reinforcementProperties.setThetaAngleShear(Double.parseDouble(thetaAngleTextField.getText()));
         double bottomReinforcementCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(bottomMainBarsComboBox.getValue().toString()), numberOfBottomBars);
         double topReinforcementCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(topMainBarsComboBox.getValue().toString()), numberOfTopBars);
-        double stirrupCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(stirrupsComboBox.getValue().toString()),numberOfStirrupArms );
+        double stirrupCrossSection = CalculationUtils.calculateCrossSectionAreaOfBars(Integer.parseInt(stirrupsComboBox.getValue().toString()), numberOfStirrupArms);
 
         reinforcementProperties.setBottomReinforcementCrossSection(bottomReinforcementCrossSection);
         reinforcementProperties.setTopReinforcementCrossSection(topReinforcementCrossSection);
@@ -189,8 +218,8 @@ public class RectangularSectionShearController {
         System.out.println("Number of Bottom Bars: " + numberOfBottomBars);
         System.out.println("Number of Top Bars: " + numberOfTopBars);
 
-        bottomCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(bottomReinforcementCrossSection));
-        topCalculatedReinforcementTextField.setText(twoDigitsAfterDecimal.format(topReinforcementCrossSection));
-        stirrupsTextField.setText(twoDigitsAfterDecimal.format(shearReinforcementSpan));
+        bottomCalculatedReinforcementTextField.setText(Constants.twoDigitsAfterDecimal.format(bottomReinforcementCrossSection));
+        topCalculatedReinforcementTextField.setText(Constants.twoDigitsAfterDecimal.format(topReinforcementCrossSection));
+        stirrupsTextField.setText(Constants.twoDigitsAfterDecimal.format(shearReinforcementSpan));
     }
 }
